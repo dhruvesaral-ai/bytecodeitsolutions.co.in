@@ -51,7 +51,22 @@ export default function PlacedStudents() {
   const row2Duplicated = [...row2, ...row2];
 
   return (
-    <section className="w-full py-14 overflow-hidden border-t border-neutral-200 bg-neutral-50/50 dark:border-neutral-800 dark:bg-neutral-950/40">
+    <section className="relative w-full py-14 overflow-hidden border-t border-neutral-200 bg-neutral-50/50 dark:border-neutral-800 dark:bg-neutral-950/40">
+      {/* Background Big Tech Companies Logos */}
+      <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center overflow-hidden">
+        <div className="relative w-full max-w-2xl h-full flex items-center justify-center opacity-10 dark:opacity-15 dark:invert">
+          <Image
+            src="/big-tech-companies-logos.png"
+            alt=""
+            aria-hidden="true"
+            fill
+            className="object-contain"
+            sizes="(max-width: 768px) 100vw, 642px"
+            unoptimized
+          />
+        </div>
+      </div>
+
       {/* Scoped Keyframes & Animation Rules */}
       <style>{`
         @keyframes marqueeLtr {
@@ -92,7 +107,7 @@ export default function PlacedStudents() {
         }
       `}</style>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 text-center">
         <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">
           Our Placed Students
         </h2>
@@ -101,7 +116,7 @@ export default function PlacedStudents() {
         </p>
       </div>
 
-      <div className="space-y-4 relative w-full overflow-hidden">
+      <div className="relative z-10 space-y-4 w-full overflow-hidden">
         {/* Row 1: Animates from Left to Right */}
         <div className="flex w-full overflow-hidden">
           <div className="marquee-track-ltr flex gap-4">

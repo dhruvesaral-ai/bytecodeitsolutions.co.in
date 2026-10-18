@@ -3,8 +3,8 @@ import Slider from "@/components/slider";
 import CategoryBox from "@/components/category-box";
 import PlacedStudents from "@/components/placed-students";
 import Footer from "@/components/footer";
+import LottieAnimation from "@/components/lottie-animation";
 import coursesData from "@/coursesdata.json";
-import homepageData from "@/homepage.json";
 import carouselData from "@/carousal.json";
 import Image from "next/image";
 
@@ -26,14 +26,21 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white">
       <Header />
       <main className="flex-1">
-        {/* Homepage Heading & Subheading from homepage.json */}
-        <section className="pt-12 pb-6 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center">
-          <h1
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-neutral-900 dark:text-white leading-tight"
-            dangerouslySetInnerHTML={{ __html: homepageData.heading }}
-          />
-          <p className="mt-4 text-base sm:text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto leading-relaxed">
-            {homepageData.subheading}
+        {/* Hero Section */}
+        <section className="pt-8 sm:pt-12 pb-4 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-left sm:text-center">
+          <h1 className="text-left sm:text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 dark:text-white">
+            We Develop Technology <br />
+            <span className="text-[#F58216]">&amp;</span> We Train Talent
+            <span className="inline-flex items-center align-middle ml-2 sm:ml-4">
+              <LottieAnimation
+                as="span"
+                animationPath="/lottiefiles/cat-crying.json"
+                className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 shrink-0 inline-block"
+              />
+            </span>
+          </h1>
+          <p className="text-base sm:text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto leading-relaxed">
+            Building digital solutions for businesses and developing the next generation of tech professionals through practical, industry-focused training.
           </p>
         </section>
 

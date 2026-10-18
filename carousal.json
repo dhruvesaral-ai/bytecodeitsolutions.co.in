@@ -2,7 +2,14 @@
   "carousal": {
     "position": "homepage",
     "carousal_slide_ids": [
-      
+      {
+        "id": "slide-001",
+        "title": "Learn from Industry Developers, Not Just Classroom Teachers",
+        "description": null,
+        "bg_img_url": "./gallery/college6.jpg",
+        "btn_href_link": "/services",
+        "text_container_align": "left"
+      },
       {
         "id": "slide-002",
         "title": "We Build Technology That Drives Business",

@@ -35,10 +35,33 @@ export default function Header() {
     setMobileMenuOpen(false);
   }, [pathname]);
 
+  // Handle ESC key to close mobile sidebar
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileMenuOpen]);
+
+  // Prevent background scroll when sidebar is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
   const isDarkMode = mounted && resolvedTheme === "dark";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white dark:border-neutral-800 dark:bg-black">
+    <header className="sticky top-0 z-40 w-full border-b border-neutral-200 bg-white dark:border-neutral-800 dark:bg-black">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left: Company Logo */}
         <div className="flex items-center">
@@ -124,7 +147,7 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Mobile Controls (Menu Toggle & Theme Toggle) */}
+        {/* Mobile Controls (Theme Toggle & Menu Button) */}
         <div className="flex items-center gap-2 md:hidden">
           <button
             type="button"
@@ -150,55 +173,136 @@ export default function Header() {
 
           <button
             type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-expanded={mobileMenuOpen}
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            onClick={() => setMobileMenuOpen(true)}
+            aria-label="Open navigation menu"
             className="flex h-9 w-9 items-center justify-center rounded-md border border-neutral-300 bg-white text-neutral-800 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] dark:border-neutral-700 dark:bg-black dark:text-neutral-200 dark:hover:bg-neutral-900 cursor-pointer"
           >
-            {mobileMenuOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
+            <Menu className="h-5 w-5" />
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
-      {mobileMenuOpen && (
-        <div className="border-t border-neutral-200 bg-white px-4 py-4 dark:border-neutral-800 dark:bg-black md:hidden">
-          <nav className="flex flex-col space-y-3" aria-label="Mobile Navigation">
+      {/* Mobile Off-Canvas Sidebar (Sliding from Right) */}
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 z-50 bg-black/60 transition-opacity duration-300 md:hidden ${
+          mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
+
+      {/* Sidebar Panel */}
+      <div
+        className={`fixed inset-y-0 right-0 z-50 w-full max-w-xs bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out md:hidden ${
+          mobileMenuOpen ? "translate-x-0" : "translate-x-full pointer-events-none"
+        }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobile Navigation"
+      >
+        {/* Sidebar Header */}
+        <div className="flex h-16 items-center justify-between px-5 border-b border-neutral-200 dark:border-neutral-800">
+          <div className="flex items-center">
+            <Image
+              src="/bytecode-light-theme-logo.png"
+              alt="Bytecode IT Solutions"
+              width={160}
+              height={53}
+              className="h-8 w-auto object-contain dark:hidden"
+            />
+            <Image
+              src="/bytecode-dark-theme-logo.png"
+              alt="Bytecode IT Solutions"
+              width={160}
+              height={53}
+              className="hidden h-8 w-auto object-contain dark:block"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="Close navigation menu"
+            className="rounded-md p-1.5 text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Sidebar Navigation Links */}
+        <div className="flex-1 overflow-y-auto px-4 py-6">
+          <nav className="flex flex-col space-y-1.5" aria-label="Mobile Navigation Links">
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`rounded-md px-3.5 py-2.5 text-sm font-medium transition-colors ${
+                pathname === "/"
+                  ? "bg-neutral-100 font-semibold text-[#1550A5] dark:bg-neutral-800 dark:text-blue-400"
+                  : "text-neutral-700 hover:bg-neutral-50 hover:text-black dark:text-neutral-300 dark:hover:bg-neutral-800/60 dark:hover:text-white"
+              }`}
+            >
+              Home
+            </Link>
+
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`rounded-md px-3.5 py-2.5 text-sm font-medium transition-colors ${
                     isActive
-                      ? "bg-neutral-100 font-semibold text-[#1550A5] dark:bg-neutral-900 dark:text-blue-400"
-                      : "text-neutral-700 hover:bg-neutral-50 hover:text-black dark:text-neutral-300 dark:hover:bg-neutral-900 dark:hover:text-white"
+                      ? "bg-neutral-100 font-semibold text-[#1550A5] dark:bg-neutral-800 dark:text-blue-400"
+                      : "text-neutral-700 hover:bg-neutral-50 hover:text-black dark:text-neutral-300 dark:hover:bg-neutral-800/60 dark:hover:text-white"
                   }`}
                 >
                   {item.label}
                 </Link>
               );
             })}
-            <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800">
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setLoginModalOpen(true);
-                }}
-                className="flex w-full items-center justify-center rounded-md bg-[#1550A5] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#124288] cursor-pointer"
-              >
-                Login
-              </button>
-            </div>
+
+            <Link
+              href="/about"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`rounded-md px-3.5 py-2.5 text-sm font-medium transition-colors ${
+                pathname === "/about"
+                  ? "bg-neutral-100 font-semibold text-[#1550A5] dark:bg-neutral-800 dark:text-blue-400"
+                  : "text-neutral-700 hover:bg-neutral-50 hover:text-black dark:text-neutral-300 dark:hover:bg-neutral-800/60 dark:hover:text-white"
+              }`}
+            >
+              About Us
+            </Link>
           </nav>
         </div>
-      )}
+
+        {/* Sidebar Bottom Footer Actions */}
+        <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 space-y-3">
+          <button
+            type="button"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              setLoginModalOpen(true);
+            }}
+            className="w-full flex items-center justify-center rounded-md bg-[#1550A5] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#124288] cursor-pointer"
+          >
+            Login
+          </button>
+
+          <div className="flex items-center justify-between pt-1 px-1 text-xs text-neutral-500 dark:text-neutral-400">
+            <span>Appearance</span>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 transition-colors cursor-pointer"
+            >
+              {isDarkMode ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
+              <span>{isDarkMode ? "Dark" : "Light"}</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Login Modal */}
       <LoginModal
