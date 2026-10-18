@@ -1,0 +1,124 @@
+{
+  "testimonials": [
+    {
+      "id": "testimonial-001",
+      "name": "Aarav Sharma",
+      "profile_img": "https://i.pravatar.cc/150?img=11",
+      "company_name": "Tech Mahindra"
+    },
+    {
+      "id": "testimonial-002",
+      "name": "Priya Verma",
+      "profile_img": "https://i.pravatar.cc/150?img=47",
+      "company_name": "Infosys"
+    },
+    {
+      "id": "testimonial-003",
+      "name": "Rahul Singh",
+      "profile_img": "https://i.pravatar.cc/150?img=12",
+      "company_name": "TCS"
+    },
+    {
+      "id": "testimonial-004",
+      "name": "Ananya Gupta",
+      "profile_img": "https://i.pravatar.cc/150?img=44",
+      "company_name": "Wipro"
+    },
+    {
+      "id": "testimonial-005",
+      "name": "Karan Mishra",
+      "profile_img": "https://i.pravatar.cc/150?img=13",
+      "company_name": "Accenture"
+    },
+    {
+      "id": "testimonial-006",
+      "name": "Sneha Patel",
+      "profile_img": "https://i.pravatar.cc/150?img=45",
+      "company_name": "Capgemini"
+    },
+    {
+      "id": "testimonial-007",
+      "name": "Rohan Mehta",
+      "profile_img": "https://i.pravatar.cc/150?img=14",
+      "company_name": "Cognizant"
+    },
+    {
+      "id": "testimonial-008",
+      "name": "Neha Agarwal",
+      "profile_img": "https://i.pravatar.cc/150?img=49",
+      "company_name": "IBM"
+    },
+    {
+      "id": "testimonial-009",
+      "name": "Aditya Kumar",
+      "profile_img": "https://i.pravatar.cc/150?img=15",
+      "company_name": "HCLTech"
+    },
+    {
+      "id": "testimonial-010",
+      "name": "Isha Kapoor",
+      "profile_img": "https://i.pravatar.cc/150?img=48",
+      "company_name": "Deloitte"
+    },
+    {
+      "id": "testimonial-011",
+      "name": "Vivek Yadav",
+      "profile_img": "https://i.pravatar.cc/150?img=16",
+      "company_name": "LTIMindtree"
+    },
+    {
+      "id": "testimonial-012",
+      "name": "Pooja Sharma",
+      "profile_img": "https://i.pravatar.cc/150?img=43",
+      "company_name": "Oracle"
+    },
+    {
+      "id": "testimonial-013",
+      "name": "Arjun Verma",
+      "profile_img": "https://i.pravatar.cc/150?img=17",
+      "company_name": "Amazon"
+    },
+    {
+      "id": "testimonial-014",
+      "name": "Kavya Singh",
+      "profile_img": "https://i.pravatar.cc/150?img=46",
+      "company_name": "Microsoft"
+    },
+    {
+      "id": "testimonial-015",
+      "name": "Mohit Gupta",
+      "profile_img": "https://i.pravatar.cc/150?img=18",
+      "company_name": "Persistent Systems"
+    },
+    {
+      "id": "testimonial-016",
+      "name": "Simran Kaur",
+      "profile_img": "https://i.pravatar.cc/150?img=41",
+      "company_name": "Genpact"
+    },
+    {
+      "id": "testimonial-017",
+      "name": "Dev Patel",
+      "profile_img": "https://i.pravatar.cc/150?img=19",
+      "company_name": "Zoho"
+    },
+    {
+      "id": "testimonial-018",
+      "name": "Riya Malhotra",
+      "profile_img": "https://i.pravatar.cc/150?img=42",
+      "company_name": "Paytm"
+    },
+    {
+      "id": "testimonial-019",
+      "name": "Siddharth Jain",
+      "profile_img": "https://i.pravatar.cc/150?img=20",
+      "company_name": "Flipkart"
+    },
+    {
+      "id": "testimonial-020",
+      "name": "Meera Joshi",
+      "profile_img": "https://i.pravatar.cc/150?img=40",
+      "company_name": "PhonePe"
+    }
+  ]
+}
