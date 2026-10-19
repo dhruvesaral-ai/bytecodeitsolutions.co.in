@@ -2,8 +2,10 @@ import Header from "@/components/header";
 import Slider from "@/components/slider";
 import CategoryBox from "@/components/category-box";
 import PlacedStudents from "@/components/placed-students";
+import SuccessStories from "@/components/success-stories";
 import Footer from "@/components/footer";
 import LottieAnimation from "@/components/lottie-animation";
+import HandDrawnCircle from "@/components/hand-drawn-circle";
 import coursesData from "@/coursesdata.json";
 import carouselData from "@/carousal.json";
 import Image from "next/image";
@@ -30,7 +32,11 @@ export default function Home() {
         <section className="pt-8 sm:pt-12 pb-4 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-left sm:text-center">
           <h1 className="text-left sm:text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 dark:text-white">
             We Develop Technology <br />
-            <span className="text-[#F58216]">&amp;</span> We Train Talent
+            <span className="text-[#F58216]">&amp;</span>{" "}
+            <span className="relative inline-block px-1.5 sm:px-2.5">
+              <span className="relative z-10">We Train Talent</span>
+              <HandDrawnCircle color="#F58216" strokeWidth={3.5} />
+            </span>
             <span className="inline-flex items-center align-middle ml-2 sm:ml-4">
               <LottieAnimation
                 as="span"
@@ -82,6 +88,9 @@ export default function Home() {
 
         {/* Placed Students Animated Section */}
         <PlacedStudents />
+
+        {/* Student Video Success Stories Full-Width Marquee */}
+        <SuccessStories />
       </main>
       <Footer />
     </div>
