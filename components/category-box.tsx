@@ -5,31 +5,21 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
 import { Navigation, Pagination } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import CourseCard, { type Course } from "@/components/cards";
-import coursesData from "@/coursesdata.json";
+import CourseCard from "@/components/cards";
+import type { Course, CourseCategory } from "@/services/CourseService";
 
 import "swiper/css";
 import "swiper/css/pagination";
 
-export interface CourseCategory {
-  id: string;
-  name: string;
-  slug: string;
-}
-
 interface CategoryBoxProps {
   category: CourseCategory;
+  courses: Course[];
 }
 
-export default function CategoryBox({ category }: CategoryBoxProps) {
+export default function CategoryBox({ category, courses }: CategoryBoxProps) {
   const swiperRef = useRef<SwiperType | null>(null);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
-
-  // Fetch / filter courses belonging to this category
-  const courses: Course[] = (coursesData.course as Course[]).filter(
-    (c) => c.course_categorie_id === category.id && c.status === "published"
-  );
 
   if (courses.length === 0) {
     return null;

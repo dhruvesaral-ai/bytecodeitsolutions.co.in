@@ -1,13 +1,18 @@
 "use client";
 
 import React from "react";
-import successStoriesData from "@/success-stories.json";
 
-export default function SuccessStories() {
-  const stories = successStoriesData.stories || [];
+interface SuccessStoriesProps {
+  videoIds: string[];
+}
+
+export default function SuccessStories({ videoIds }: SuccessStoriesProps) {
+  if (videoIds.length === 0) {
+    return null;
+  }
 
   // Duplicate the stories array to ensure an infinite, seamless continuous loop
-  const duplicatedStories = [...stories, ...stories];
+  const duplicatedStories = [...videoIds, ...videoIds];
 
   return (
     <section className="relative w-full py-14 overflow-hidden border-t border-neutral-200 bg-neutral-50/50 dark:border-neutral-800 dark:bg-neutral-950/40">
@@ -47,13 +52,13 @@ export default function SuccessStories() {
       <div className="relative z-10 w-full overflow-hidden">
         <div className="flex w-full overflow-hidden">
           <div className="marquee-track-ltr-videos flex gap-6 px-4">
-            {duplicatedStories.map((story, idx) => (
+            {duplicatedStories.map((videoId, idx) => (
               <div
-                key={`${story.video_id}-${idx}`}
+                key={`${videoId}-${idx}`}
                 className="w-[85vw] sm:w-[46vw] lg:w-[calc((100vw-6rem)/3)] max-w-[480px] min-w-[280px] aspect-video shrink-0 rounded-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-black shadow-md"
               >
                 <iframe
-                  src={`https://www.youtube.com/embed/${story.video_id}?autoplay=1&mute=1&loop=1&playlist=${story.video_id}&controls=1&rel=0`}
+                  src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=1&rel=0`}
                   title={`Success Story Video ${idx + 1}`}
                   className="w-full h-full border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

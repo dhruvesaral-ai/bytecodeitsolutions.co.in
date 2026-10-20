@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -10,23 +9,10 @@ import { Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 
-import carouselData from "@/carousal.json";
-
-export interface CarouselSlide {
-  id?: string;
-  order?: number;
-  title?: string | null;
-  description?: string | null;
-  bg_img_url?: string | null;
-  img_url?: string | null;
-  btn_href_link?: string | null;
-  go_to_link?: string | null;
-  banner_href_link?: string | null;
-  text_container_align?: "left" | "center" | "right" | string | null;
-}
+import { MEDIA_BASE_URL } from "@/config";
+import type { CarouselSlide } from "@/services/CarousalSliderService";
 
 export interface SliderProps {
-  position?: string;
   slides?: CarouselSlide[];
   className?: string;
   heightClassName?: string;
@@ -34,33 +20,12 @@ export interface SliderProps {
 }
 
 export default function Slider({
-  position = "homepage",
-  slides: propSlides,
+  slides = [],
   className = "",
   heightClassName = "h-[280px] sm:h-[380px] md:h-[460px] lg:h-[500px]",
   autoplayDelay = 4000,
 }: SliderProps) {
-  // Resolve slides: priority to propSlides, otherwise lookup in carousal.json by position
-  const resolvedSlides: CarouselSlide[] = useMemo(() => {
-    if (propSlides && propSlides.length > 0) {
-      return propSlides;
-    }
-
-    const rawCarousal = (carouselData as any)?.carousal;
-
-    if (Array.isArray(rawCarousal)) {
-      const match = rawCarousal.find((c: any) => c.position === position);
-      return match?.carousal_slide_ids || [];
-    } else if (rawCarousal && typeof rawCarousal === "object") {
-      if (rawCarousal.position === position || !position) {
-        return rawCarousal.carousal_slide_ids || [];
-      }
-    }
-
-    return [];
-  }, [propSlides, position]);
-
-  if (!resolvedSlides || resolvedSlides.length === 0) {
+  if (slides.length === 0) {
     return null;
   }
 
@@ -92,16 +57,18 @@ export default function Slider({
   };
 
   const getImageUrl = (slide: CarouselSlide) => {
-    const url = slide.bg_img_url || slide.img_url;
+    const url = slide.bgImgUrl || slide.imgUrl;
     if (!url) return null;
-    if (url.startsWith("./")) {
-      return url.slice(1);
+
+    try {
+      return new URL(url, `${MEDIA_BASE_URL.replace(/\/+$/, "")}/`).toString();
+    } catch {
+      throw new Error(`Invalid carousel image URL: ${url}`);
     }
-    return url;
   };
 
   const getButtonUrl = (slide: CarouselSlide) => {
-    return slide.btn_href_link || slide.go_to_link || null;
+    return slide.btnHrefLink || null;
   };
 
   return (
@@ -118,17 +85,17 @@ export default function Slider({
             disableOnInteraction: false,
             pauseOnMouseEnter: true,
           }}
-          loop={resolvedSlides.length > 1}
+          loop={slides.length > 1}
           pagination={{
             clickable: true,
           }}
           className="hero-swiper h-full w-full"
         >
-          {resolvedSlides.map((slide, index) => {
-            const align = getAlignmentClasses(slide.text_container_align);
+          {slides.map((slide, index) => {
+            const align = getAlignmentClasses(slide.textContainerAlign);
             const imageUrl = getImageUrl(slide);
             const btnUrl = getButtonUrl(slide);
-            const bannerLink = slide.banner_href_link || null;
+            const bannerLink = slide.bannerHrefLink || null;
             const hasContent = Boolean(slide.title || slide.description || btnUrl);
 
             return (

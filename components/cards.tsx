@@ -4,23 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Star, Clock } from "lucide-react";
-
-export interface Course {
-  id: string;
-  name: string;
-  description: string;
-  originalPrice: number;
-  discountedPrice: number;
-  rating: number;
-  technology_tags: string[];
-  duration: string;
-  status: string;
-  course_img_url: string;
-  syllabus: string[];
-  course_categorie_id: string;
-  is_placement_gurranted: boolean;
-  is_in_sale: boolean;
-}
+import type { Course } from "@/services/CourseService";
 
 interface CourseCardProps {
   course: Course;
@@ -40,7 +24,7 @@ export default function CourseCard({ course }: CourseCardProps) {
       {/* Course Thumbnail */}
       <div className="relative aspect-video w-full overflow-hidden bg-neutral-100 dark:bg-neutral-800">
         <Image
-          src={course.course_img_url}
+          src={course.courseImgUrl}
           alt={course.name}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
@@ -50,7 +34,7 @@ export default function CourseCard({ course }: CourseCardProps) {
 
         {/* Badges on Thumbnail */}
         <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
-          {course.is_in_sale ? (
+          {course.isInSale ? (
             <span className="rounded bg-[#F58216] px-2 py-0.5 text-[11px] font-semibold text-white tracking-wide">
               Sale
             </span>
@@ -75,7 +59,7 @@ export default function CourseCard({ course }: CourseCardProps) {
           </div>
 
           <div className="flex items-center gap-1 overflow-hidden">
-            {course.technology_tags.slice(0, 2).map((tag) => (
+            {course.technologyTags.slice(0, 2).map((tag) => (
               <span
                 key={tag}
                 className="rounded border border-neutral-200 bg-neutral-50 px-1.5 py-0.5 text-[10px] font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 truncate max-w-[80px]"
@@ -93,7 +77,7 @@ export default function CourseCard({ course }: CourseCardProps) {
 
         {/* Description */}
         <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400 line-clamp-2 leading-relaxed flex-1">
-          {course.description}
+          {course.shortDescription}
         </p>
 
         {/* Pricing & CTA */}
