@@ -87,7 +87,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/programs"
+                  href="/courses"
                   className="transition-colors hover:text-[#1550A5] dark:hover:text-blue-400"
                 >
                   College Technical Workshops
@@ -95,7 +95,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/programs"
+                  href="/courses"
                   className="transition-colors hover:text-[#1550A5] dark:hover:text-blue-400"
                 >
                   Corporate Upskilling Programs

@@ -1,5 +1,5 @@
 import { MEDIA_BASE_URL } from "@/config";
-import { get } from "@/lib/api-method";
+import { ApiRequestError, get } from "@/lib/api-method";
 
 export interface CourseCategory {
   id: string;
@@ -11,6 +11,7 @@ export interface Course {
   id: string;
   name: string;
   shortDescription: string;
+  longDescription: string;
   originalPrice: number;
   discountedPrice: number;
   rating: number;
@@ -20,6 +21,9 @@ export interface Course {
   courseImgUrl: string;
   courseCategorieId: string;
   isInSale: boolean;
+  syllabus: string | null;
+  isPlacementGurranted: boolean;
+  courseCategorie: CourseCategory | null;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -71,6 +75,10 @@ function parseCourse(value: unknown, index: number): Course {
     id: value.id,
     name: value.name,
     shortDescription: description,
+    longDescription:
+      typeof value.longDescription === "string"
+        ? value.longDescription
+        : description,
     originalPrice: parsePrice(value.originalPrice, "originalPrice", index),
     discountedPrice: parsePrice(value.discountedPrice, "discountedPrice", index),
     rating: typeof value.rating === "number" ? value.rating : 0,
@@ -80,6 +88,14 @@ function parseCourse(value: unknown, index: number): Course {
     courseImgUrl: resolveMediaUrl(value.courseImgUrl),
     courseCategorieId: value.courseCategorieId,
     isInSale: value.isInSale === true,
+    syllabus:
+      typeof value.syllabus === "string"
+        ? resolveMediaUrl(value.syllabus)
+        : null,
+    isPlacementGurranted: value.isPlacementGurranted === true,
+    courseCategorie: isCourseCategory(value.courseCategorie)
+      ? value.courseCategorie
+      : null,
   };
 }
 
@@ -118,6 +134,29 @@ export default class CourseService {
     }
 
     return response.data.map(parseCourse);
+  }
+
+  async getCourseById(id: string): Promise<Course | null> {
+    let response: unknown;
+
+    try {
+      response = await get<unknown>(`courses/${encodeURIComponent(id)}`);
+    } catch (error) {
+      if (error instanceof ApiRequestError && error.status === 404) {
+        return null;
+      }
+      throw error;
+    }
+
+    if (isRecord(response) && response.error === "Course not found") {
+      return null;
+    }
+
+    if (!isRecord(response) || !("data" in response)) {
+      throw new Error(`Course API response is invalid for course "${id}".`);
+    }
+
+    return parseCourse(response.data, 0);
   }
 }
 

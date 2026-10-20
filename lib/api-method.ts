@@ -1,5 +1,15 @@
 import { BACKEND_URL } from "@/config";
 
+export class ApiRequestError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number
+  ) {
+    super(message);
+    this.name = "ApiRequestError";
+  }
+}
+
 async function request<T>(
   method: string,
   endpoint: string,
@@ -16,8 +26,9 @@ async function request<T>(
   if (!response.ok) {
     const responseBody = await response.text();
     const detail = responseBody ? `: ${responseBody}` : "";
-    throw new Error(
-      `${method} ${url} failed (${response.status} ${response.statusText})${detail}`
+    throw new ApiRequestError(
+      `${method} ${url} failed (${response.status} ${response.statusText})${detail}`,
+      response.status
     );
   }
 
