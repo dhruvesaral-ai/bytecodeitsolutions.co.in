@@ -18,7 +18,7 @@ export default function CourseCard({ course }: CourseCardProps) {
       maximumFractionDigits: 0,
     }).format(val);
   };
-
+  console.log("CourseCard rendered for course:", course); // Debugging log
   return (
     <div className="group flex flex-col h-full rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 overflow-hidden hover:border-[#1550A5] transition-colors">
       {/* Course Thumbnail */}

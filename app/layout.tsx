@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { ThemeProvider } from "@/context/theme-context";
 import SmoothScroll from "@/components/smooth-scroll";
+import EnquireNow from "@/components/enquire-now";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-screen flex flex-col">
         <ThemeProvider>
           <SmoothScroll>{children}</SmoothScroll>
+          <EnquireNow />
         </ThemeProvider>
       </body>
     </html>
