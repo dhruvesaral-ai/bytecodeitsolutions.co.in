@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Footer from "@/components/footer";
-import Header from "@/components/header";
 import { courseService } from "@/services/CourseService";
 
 function formatCurrency(price: number): string {
@@ -140,10 +139,7 @@ export default function CoursePage({
   params,
 }: PageProps<"/courses/[id]">) {
   return (
-    <div className="flex min-h-screen flex-col bg-white text-black dark:bg-black dark:text-white">
-      <Suspense fallback={<div className="h-16" aria-busy="true" />}>
-        <Header />
-      </Suspense>
+    <div className="flex-1 flex flex-col">
       <Suspense
         fallback={
           <main className="mx-auto min-h-[60vh] w-full max-w-7xl flex-1 px-4 py-10 sm:px-6 lg:px-8" aria-busy="true" />

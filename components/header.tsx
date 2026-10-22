@@ -7,27 +7,109 @@ import { usePathname } from "next/navigation";
 import { Sun, Moon, Menu, X } from "lucide-react";
 import { useTheme } from "@/context/theme-context";
 import LoginModal from "@/components/login";
+import type { PageData } from "@/services/PageService";
 
-interface NavItem {
+export interface NavItem {
   label: string;
   href: string;
 }
 
-const NAV_ITEMS: NavItem[] = [
+export const DEFAULT_NAV_ITEMS: NavItem[] = [
   { label: "Development", href: "/development" },
   { label: "Courses", href: "/courses" },
   { label: "Trainings", href: "/trainings" },
 ];
 
-export default function Header() {
+export function formatNavLabel(routeName: string): string {
+  const clean = routeName.trim().replace(/^\/+/, "");
+  if (!clean || clean.toLowerCase() === "home") {
+    return "Home";
+  }
+  return clean
+    .replace(/[-_]+/g, " ")
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
+
+export function formatNavHref(routeName: string): string {
+  const clean = routeName.trim().replace(/^\/+/, "");
+  if (!clean || clean.toLowerCase() === "home") {
+    return "/";
+  }
+  return `/${clean}`;
+}
+
+export function pagesToNavItems(pages: PageData[]): NavItem[] {
+  if (!pages || pages.length === 0) {
+    return DEFAULT_NAV_ITEMS;
+  }
+
+  const items = pages.map((page) => ({
+    label: formatNavLabel(page.routeName),
+    href: formatNavHref(page.routeName),
+  }));
+
+  const uniqueItems: NavItem[] = [];
+  const seenHrefs = new Set<string>();
+
+  for (const item of items) {
+    if (!seenHrefs.has(item.href)) {
+      seenHrefs.add(item.href);
+      uniqueItems.push(item);
+    }
+  }
+
+  return uniqueItems.length > 0 ? uniqueItems : DEFAULT_NAV_ITEMS;
+}
+
+interface HeaderProps {
+  initialPages?: PageData[];
+}
+
+export default function Header({ initialPages }: HeaderProps = {}) {
   const pathname = usePathname();
   const { resolvedTheme, toggleTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [navItems, setNavItems] = useState<NavItem[]>(() =>
+    initialPages && initialPages.length > 0
+      ? pagesToNavItems(initialPages)
+      : DEFAULT_NAV_ITEMS
+  );
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Fetch dynamic pages from /api/pages on mount to keep menubar updated
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function fetchPages() {
+      try {
+        const response = await fetch("/api/pages");
+        if (!response.ok) return;
+        const result = await response.json();
+        if (
+          !isCancelled &&
+          result &&
+          Array.isArray(result.data) &&
+          result.data.length > 0
+        ) {
+          setNavItems(pagesToNavItems(result.data));
+        }
+      } catch (err) {
+        console.warn("Failed to fetch pages for menubar:", err);
+      }
+    }
+
+    fetchPages();
+
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   // Close mobile menu on route change
@@ -94,7 +176,7 @@ export default function Header() {
           className="hidden md:flex items-center gap-8"
           aria-label="Main Navigation"
         >
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
@@ -233,19 +315,21 @@ export default function Header() {
         {/* Sidebar Navigation Links */}
         <div className="flex-1 overflow-y-auto px-4 py-6">
           <nav className="flex flex-col space-y-1.5" aria-label="Mobile Navigation Links">
-            <Link
-              href="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`rounded-md px-3.5 py-2.5 text-sm font-medium transition-colors ${
-                pathname === "/"
-                  ? "bg-neutral-100 font-semibold text-[#1550A5] dark:bg-neutral-800 dark:text-blue-400"
-                  : "text-neutral-700 hover:bg-neutral-50 hover:text-black dark:text-neutral-300 dark:hover:bg-neutral-800/60 dark:hover:text-white"
-              }`}
-            >
-              Home
-            </Link>
+            {!navItems.some((item) => item.href === "/") && (
+              <Link
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`rounded-md px-3.5 py-2.5 text-sm font-medium transition-colors ${
+                  pathname === "/"
+                    ? "bg-neutral-100 font-semibold text-[#1550A5] dark:bg-neutral-800 dark:text-blue-400"
+                    : "text-neutral-700 hover:bg-neutral-50 hover:text-black dark:text-neutral-300 dark:hover:bg-neutral-800/60 dark:hover:text-white"
+                }`}
+              >
+                Home
+              </Link>
+            )}
 
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
@@ -263,17 +347,19 @@ export default function Header() {
               );
             })}
 
-            <Link
-              href="/about"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`rounded-md px-3.5 py-2.5 text-sm font-medium transition-colors ${
-                pathname === "/about"
-                  ? "bg-neutral-100 font-semibold text-[#1550A5] dark:bg-neutral-800 dark:text-blue-400"
-                  : "text-neutral-700 hover:bg-neutral-50 hover:text-black dark:text-neutral-300 dark:hover:bg-neutral-800/60 dark:hover:text-white"
-              }`}
-            >
-              About Us
-            </Link>
+            {!navItems.some((item) => item.href === "/about") && (
+              <Link
+                href="/about"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`rounded-md px-3.5 py-2.5 text-sm font-medium transition-colors ${
+                  pathname === "/about"
+                    ? "bg-neutral-100 font-semibold text-[#1550A5] dark:bg-neutral-800 dark:text-blue-400"
+                    : "text-neutral-700 hover:bg-neutral-50 hover:text-black dark:text-neutral-300 dark:hover:bg-neutral-800/60 dark:hover:text-white"
+                }`}
+              >
+                About Us
+              </Link>
+            )}
           </nav>
         </div>
 

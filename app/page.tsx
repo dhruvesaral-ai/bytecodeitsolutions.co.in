@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import Header from "@/components/header";
 import PlacedStudents from "@/components/placed-students";
 import SuccessStories from "@/components/success-stories";
 import Footer from "@/components/footer";
@@ -9,8 +8,7 @@ import HomeContent from "@/components/home-content";
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white">
-      <Header />
+    <div className="flex-1 flex flex-col">
       <main className="flex-1">
         {/* Hero Section */}
         <section className="pt-8 sm:pt-12 pb-4 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-left sm:text-center">

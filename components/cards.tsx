@@ -18,29 +18,45 @@ export default function CourseCard({ course }: CourseCardProps) {
       maximumFractionDigits: 0,
     }).format(val);
   };
-  console.log("CourseCard rendered for course:", course); // Debugging log
+
+  const discountPercent =
+    course.originalPrice > course.discountedPrice
+      ? Math.round(
+          ((course.originalPrice - course.discountedPrice) /
+            course.originalPrice) *
+            100
+        )
+      : 0;
+
   return (
-    <div className="group flex flex-col h-full rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 overflow-hidden hover:border-[#1550A5] transition-colors">
+    <article className="group flex flex-col h-full rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 overflow-hidden hover:border-[#1550A5] transition-all duration-200">
       {/* Course Thumbnail */}
       <div className="relative aspect-video w-full overflow-hidden bg-neutral-100 dark:bg-neutral-800">
-        <Image
-          src={course.courseImgUrl}
-          alt={course.name}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-          unoptimized
-        />
+        <Link href={`/courses/${course.id}`} tabIndex={-1} aria-hidden="true">
+          <Image
+            src={course.courseImgUrl}
+            alt={course.name}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            unoptimized
+          />
+        </Link>
 
         {/* Badges on Thumbnail */}
         <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
-          {course.isInSale ? (
-            <span className="rounded bg-[#F58216] px-2 py-0.5 text-[11px] font-semibold text-white tracking-wide">
-              Sale
-            </span>
-          ) : (
-            <span />
-          )}
+          <div className="flex items-center gap-1.5">
+            {course.isInSale && (
+              <span className="rounded bg-[#F58216] px-2 py-0.5 text-[11px] font-semibold text-white tracking-wide">
+                Sale
+              </span>
+            )}
+            {course.isPlacementGurranted && (
+              <span className="rounded bg-emerald-600 px-2 py-0.5 text-[11px] font-medium text-white tracking-wide">
+                Placement Assured
+              </span>
+            )}
+          </div>
 
           <div className="flex items-center gap-1 rounded bg-black/75 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur-none">
             <Clock className="size-3" />
@@ -67,12 +83,29 @@ export default function CourseCard({ course }: CourseCardProps) {
                 {tag}
               </span>
             ))}
+            {course.technologyTags.length > 2 && (
+              <span className="text-[10px] text-neutral-500 dark:text-neutral-400 font-medium">
+                +{course.technologyTags.length - 2}
+              </span>
+            )}
           </div>
         </div>
 
+        {/* Category if available */}
+        {course.courseCategorie && (
+          <p className="text-[11px] font-medium text-[#1550A5] dark:text-blue-400 mb-1">
+            {course.courseCategorie.name}
+          </p>
+        )}
+
         {/* Title */}
         <h3 className="text-sm font-semibold text-neutral-900 dark:text-white line-clamp-2 leading-snug min-h-[2.5rem]">
-          {course.name}
+          <Link
+            href={`/courses/${course.id}`}
+            className="hover:text-[#1550A5] dark:hover:text-blue-400 transition-colors"
+          >
+            {course.name}
+          </Link>
         </h3>
 
         {/* Description */}
@@ -83,9 +116,16 @@ export default function CourseCard({ course }: CourseCardProps) {
         {/* Pricing & CTA */}
         <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between gap-2">
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-neutral-900 dark:text-white">
-              {formatCurrency(course.discountedPrice)}
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-bold text-neutral-900 dark:text-white">
+                {formatCurrency(course.discountedPrice)}
+              </span>
+              {discountPercent > 0 && (
+                <span className="text-[10px] font-semibold text-[#F58216]">
+                  {discountPercent}% OFF
+                </span>
+              )}
+            </div>
             {course.originalPrice > course.discountedPrice && (
               <span className="text-[11px] text-neutral-400 line-through">
                 {formatCurrency(course.originalPrice)}
@@ -95,12 +135,12 @@ export default function CourseCard({ course }: CourseCardProps) {
 
           <Link
             href={`/courses/${course.id}`}
-            className="inline-flex items-center justify-center rounded-md bg-[#1550A5] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#124288] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5]"
+            className="inline-flex items-center justify-center rounded-md bg-[#1550A5] px-3.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#124288] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5]"
           >
             Explore
           </Link>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

@@ -1,5 +1,6 @@
 import { MEDIA_BASE_URL } from "@/config";
 import { ApiRequestError, get } from "@/lib/api-method";
+import fallbackData from "@/coursesdata.json";
 
 export interface CourseCategory {
   id: string;
@@ -107,57 +108,92 @@ function resolveMediaUrl(url: string): string {
   }
 }
 
+function getFallbackCategories(): CourseCategory[] {
+  return (fallbackData.course_categorie || []).map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+    slug: cat.slug,
+  }));
+}
+
+function getFallbackCourses(): Course[] {
+  const categories = getFallbackCategories();
+  const categoryMap = new Map(categories.map((c) => [c.id, c]));
+
+  return (fallbackData.course || []).map((c) => {
+    const description = typeof c.description === "string" ? c.description : "";
+    return {
+      id: c.id,
+      name: c.name,
+      shortDescription: description,
+      longDescription: description,
+      originalPrice: typeof c.originalPrice === "number" ? c.originalPrice : 0,
+      discountedPrice: typeof c.discountedPrice === "number" ? c.discountedPrice : 0,
+      rating: typeof c.rating === "number" ? c.rating : 5,
+      technologyTags: Array.isArray(c.technology_tags) ? c.technology_tags : [],
+      duration: typeof c.duration === "string" ? c.duration : "",
+      status: "active",
+      courseImgUrl: c.course_img_url,
+      courseCategorieId: c.course_categorie_id,
+      isInSale: c.is_in_sale === true,
+      syllabus: Array.isArray(c.syllabus) ? c.syllabus.join("\n") : (c.syllabus || null),
+      isPlacementGurranted: c.is_placement_gurranted === true,
+      courseCategorie: categoryMap.get(c.course_categorie_id) || null,
+    };
+  });
+}
+
 export default class CourseService {
   async getCourseCategories(): Promise<CourseCategory[]> {
-    const response = await get<{ data: unknown[] }>("course-categories");
+    try {
+      const response = await get<{ data: unknown[] }>("course-categories");
 
-    if (!response || !Array.isArray(response.data) || !response.data.every(isCourseCategory)) {
-      throw new Error("Course categories API response is invalid.");
+      if (response && Array.isArray(response.data) && response.data.every(isCourseCategory)) {
+        return response.data;
+      }
+    } catch {
+      // Backend is unavailable, use local fallback
     }
 
-    return response.data;
+    return getFallbackCategories();
   }
 
   async getCourses(): Promise<Course[]> {
-    const response = await get<unknown>("courses");
+    try {
+      const response = await get<unknown>("courses");
 
-    if (!isRecord(response) || !Array.isArray(response.data)) {
-      const received =
-        response === null
-          ? "empty response"
-          : isRecord(response)
-            ? `object with keys [${Object.keys(response).join(", ")}] and data type "${typeof response.data}"`
-            : `${typeof response}`;
-      throw new Error(
-        `Courses API response must be an object with a data array; received ${received}.`
-      );
+      if (isRecord(response) && Array.isArray(response.data)) {
+        return response.data.map(parseCourse);
+      }
+    } catch {
+      // Backend is unavailable, use local fallback
     }
 
-    return response.data.map(parseCourse);
+    return getFallbackCourses();
   }
 
   async getCourseById(id: string): Promise<Course | null> {
-    let response: unknown;
-
     try {
-      response = await get<unknown>(`courses/${encodeURIComponent(id)}`);
+      const response = await get<unknown>(`courses/${encodeURIComponent(id)}`);
+
+      if (isRecord(response) && response.error === "Course not found") {
+        return null;
+      }
+
+      if (isRecord(response) && "data" in response) {
+        return parseCourse(response.data, 0);
+      }
     } catch (error) {
       if (error instanceof ApiRequestError && error.status === 404) {
         return null;
       }
-      throw error;
+      // Backend is unavailable, use local fallback
     }
 
-    if (isRecord(response) && response.error === "Course not found") {
-      return null;
-    }
-
-    if (!isRecord(response) || !("data" in response)) {
-      throw new Error(`Course API response is invalid for course "${id}".`);
-    }
-
-    return parseCourse(response.data, 0);
+    const localCourse = getFallbackCourses().find((c) => c.id === id);
+    return localCourse || null;
   }
 }
 
 export const courseService = new CourseService();
+

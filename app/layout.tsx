@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { ThemeProvider } from "@/context/theme-context";
 import SmoothScroll from "@/components/smooth-scroll";
+import Header from "@/components/header";
 import EnquireNow from "@/components/enquire-now";
 import "./globals.css";
 
@@ -15,6 +17,20 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Bytecode IT Solutions",
   description: "Innovative software solutions, training, and programs.",
+  icons: {
+    icon: [
+      { url: "/favicons/favicon.ico" },
+      { url: "/favicons/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicons/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicons/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicons/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: "/favicons/favicon.ico",
+    apple: [
+      { url: "/favicons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -41,8 +57,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
       </head>
-      <body className="min-h-screen flex flex-col">
+      <body className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white">
         <ThemeProvider>
+          <Suspense
+            fallback={
+              <div
+                className="h-16 w-full border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black"
+                aria-busy="true"
+              />
+            }
+          >
+            <Header />
+          </Suspense>
           <SmoothScroll>{children}</SmoothScroll>
           <EnquireNow />
         </ThemeProvider>
