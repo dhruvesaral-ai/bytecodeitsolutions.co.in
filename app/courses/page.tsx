@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Sparkles, MessageCircle, ArrowRight } from "lucide-react";
 import Footer from "@/components/footer";
+import EnquireNow from "@/components/enquire-now";
 import CoursesExplorer from "@/components/courses-explorer";
 import { courseService } from "@/services/CourseService";
 import { pageService } from "@/services/PageService";
@@ -148,6 +149,7 @@ export default function CoursesPage() {
         </section>
       </main>
 
+      <EnquireNow />
       <Suspense fallback={null}>
         <Footer />
       </Suspense>

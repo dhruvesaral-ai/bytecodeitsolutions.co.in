@@ -4,8 +4,15 @@ import { Poppins } from "next/font/google";
 import { ThemeProvider } from "@/context/theme-context";
 import SmoothScroll from "@/components/smooth-scroll";
 import Header from "@/components/header";
-import EnquireNow from "@/components/enquire-now";
+import { pageService } from "@/services/PageService";
 import "./globals.css";
+import Footer from "@/components/footer";
+
+async function HeaderSlot() {
+  const pages = await pageService.getPages();
+  console.log("Pages :",pages);
+  return <Header initialPages={pages} />;
+}
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -33,7 +40,11 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"
@@ -67,10 +78,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               />
             }
           >
-            <Header />
+            <HeaderSlot />
           </Suspense>
           <SmoothScroll>{children}</SmoothScroll>
-          <EnquireNow />
+          <Suspense fallback={null}>
+            <Footer />
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>

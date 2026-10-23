@@ -1,10 +1,9 @@
 import { Suspense } from "react";
 import PlacedStudents from "@/components/placed-students";
-import SuccessStories from "@/components/success-stories";
-import Footer from "@/components/footer";
 import LottieAnimation from "@/components/lottie-animation";
 import HandDrawnCircle from "@/components/hand-drawn-circle";
 import HomeContent from "@/components/home-content";
+import EnquireNow from "@/components/enquire-now";
 
 export default function Home() {
   return (
@@ -39,9 +38,7 @@ export default function Home() {
         {/* Placed Students Animated Section */}
         <PlacedStudents />
       </main>
-      <Suspense fallback={null}>
-        <Footer />
-      </Suspense>
+      <EnquireNow />
     </div>
   );
 }

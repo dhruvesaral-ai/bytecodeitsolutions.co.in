@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Footer from "@/components/footer";
+import EnquireNow from "@/components/enquire-now";
 import { courseService } from "@/services/CourseService";
 
 function formatCurrency(price: number): string {
@@ -137,7 +138,9 @@ async function CourseDetails({
 
 export default function CoursePage({
   params,
-}: PageProps<"/courses/[id]">) {
+}: {
+  params: Promise<{ id: string }>;
+}) {
   return (
     <div className="flex-1 flex flex-col">
       <Suspense
@@ -147,6 +150,7 @@ export default function CoursePage({
       >
         <CourseDetails params={params} />
       </Suspense>
+      <EnquireNow />
       <Suspense fallback={null}>
         <Footer />
       </Suspense>

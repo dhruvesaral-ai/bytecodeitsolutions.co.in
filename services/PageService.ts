@@ -43,15 +43,13 @@ export default class PageService {
     try {
       const response = await get<{ data?: unknown[] }>("pages");
       if (response && isRecord(response) && Array.isArray(response.data)) {
-        const pages = response.data.filter(isPageData);
-        if (pages.length > 0) {
-          return pages;
-        }
+        
+        return response.data.filter(isPageData);
       }
     } catch {
       // Backend is unavailable or prerendering
     }
-    return DEFAULT_PAGES;
+    return [];
   }
 
   async getPageByRoute(routeName: string): Promise<PageData | null> {

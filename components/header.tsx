@@ -14,12 +14,6 @@ export interface NavItem {
   href: string;
 }
 
-export const DEFAULT_NAV_ITEMS: NavItem[] = [
-  { label: "Development", href: "/development" },
-  { label: "Courses", href: "/courses" },
-  { label: "Trainings", href: "/trainings" },
-];
-
 export function formatNavLabel(routeName: string): string {
   const clean = routeName.trim().replace(/^\/+/, "");
   if (!clean || clean.toLowerCase() === "home") {
@@ -41,8 +35,8 @@ export function formatNavHref(routeName: string): string {
 }
 
 export function pagesToNavItems(pages: PageData[]): NavItem[] {
-  if (!pages || pages.length === 0) {
-    return DEFAULT_NAV_ITEMS;
+  if (!pages || !Array.isArray(pages) || pages.length === 0) {
+    return [];
   }
 
   const items = pages.map((page) => ({
@@ -60,7 +54,7 @@ export function pagesToNavItems(pages: PageData[]): NavItem[] {
     }
   }
 
-  return uniqueItems.length > 0 ? uniqueItems : DEFAULT_NAV_ITEMS;
+  return uniqueItems;
 }
 
 interface HeaderProps {
@@ -74,43 +68,18 @@ export default function Header({ initialPages }: HeaderProps = {}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [navItems, setNavItems] = useState<NavItem[]>(() =>
-    initialPages && initialPages.length > 0
-      ? pagesToNavItems(initialPages)
-      : DEFAULT_NAV_ITEMS
+    initialPages && initialPages.length > 0 ? pagesToNavItems(initialPages) : []
   );
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Fetch dynamic pages from /api/pages on mount to keep menubar updated
   useEffect(() => {
-    let isCancelled = false;
-
-    async function fetchPages() {
-      try {
-        const response = await fetch("/api/pages");
-        if (!response.ok) return;
-        const result = await response.json();
-        if (
-          !isCancelled &&
-          result &&
-          Array.isArray(result.data) &&
-          result.data.length > 0
-        ) {
-          setNavItems(pagesToNavItems(result.data));
-        }
-      } catch (err) {
-        console.warn("Failed to fetch pages for menubar:", err);
-      }
-    }
-
-    fetchPages();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, []);
+    setNavItems(
+      initialPages && initialPages.length > 0 ? pagesToNavItems(initialPages) : []
+    );
+  }, [initialPages]);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -315,20 +284,6 @@ export default function Header({ initialPages }: HeaderProps = {}) {
         {/* Sidebar Navigation Links */}
         <div className="flex-1 overflow-y-auto px-4 py-6">
           <nav className="flex flex-col space-y-1.5" aria-label="Mobile Navigation Links">
-            {!navItems.some((item) => item.href === "/") && (
-              <Link
-                href="/"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`rounded-md px-3.5 py-2.5 text-sm font-medium transition-colors ${
-                  pathname === "/"
-                    ? "bg-neutral-100 font-semibold text-[#1550A5] dark:bg-neutral-800 dark:text-blue-400"
-                    : "text-neutral-700 hover:bg-neutral-50 hover:text-black dark:text-neutral-300 dark:hover:bg-neutral-800/60 dark:hover:text-white"
-                }`}
-              >
-                Home
-              </Link>
-            )}
-
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -346,20 +301,6 @@ export default function Header({ initialPages }: HeaderProps = {}) {
                 </Link>
               );
             })}
-
-            {!navItems.some((item) => item.href === "/about") && (
-              <Link
-                href="/about"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`rounded-md px-3.5 py-2.5 text-sm font-medium transition-colors ${
-                  pathname === "/about"
-                    ? "bg-neutral-100 font-semibold text-[#1550A5] dark:bg-neutral-800 dark:text-blue-400"
-                    : "text-neutral-700 hover:bg-neutral-50 hover:text-black dark:text-neutral-300 dark:hover:bg-neutral-800/60 dark:hover:text-white"
-                }`}
-              >
-                About Us
-              </Link>
-            )}
           </nav>
         </div>
 
