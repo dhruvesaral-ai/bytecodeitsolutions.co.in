@@ -1,4 +1,4 @@
-name: Deploy Bytecode Website
+name: Deploy Bytecode Client Website
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
             export NVM_DIR="/root/.nvm"
             export PATH="/root/.nvm/versions/node/v24.21.0/bin:/usr/local/bin:/usr/bin:/bin"
 
-            cd /var/www/admin.bytecodeitsolutions.co.in
+            cd /var/www/bytecodeitsolutions.co.in
 
             node -v
             yarn -v
@@ -32,4 +32,4 @@ jobs:
             yarn prisma generate
             yarn prisma migrate deploy
             yarn build
-            pm2 restart admin.bytecodeitsolutions --update-env
+            pm2 restart bytecodeitsolutions --update-env
