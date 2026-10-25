@@ -1,6 +1,5 @@
 import { MEDIA_BASE_URL } from "@/config";
 import { ApiRequestError, get } from "@/lib/api-method";
-import fallbackData from "@/coursesdata.json";
 
 export interface CourseCategory {
   id: string;
@@ -108,41 +107,6 @@ function resolveMediaUrl(url: string): string {
   }
 }
 
-function getFallbackCategories(): CourseCategory[] {
-  return (fallbackData.course_categorie || []).map((cat) => ({
-    id: cat.id,
-    name: cat.name,
-    slug: cat.slug,
-  }));
-}
-
-function getFallbackCourses(): Course[] {
-  const categories = getFallbackCategories();
-  const categoryMap = new Map(categories.map((c) => [c.id, c]));
-
-  return (fallbackData.course || []).map((c) => {
-    const description = typeof c.description === "string" ? c.description : "";
-    return {
-      id: c.id,
-      name: c.name,
-      shortDescription: description,
-      longDescription: description,
-      originalPrice: typeof c.originalPrice === "number" ? c.originalPrice : 0,
-      discountedPrice: typeof c.discountedPrice === "number" ? c.discountedPrice : 0,
-      rating: typeof c.rating === "number" ? c.rating : 5,
-      technologyTags: Array.isArray(c.technology_tags) ? c.technology_tags : [],
-      duration: typeof c.duration === "string" ? c.duration : "",
-      status: "active",
-      courseImgUrl: c.course_img_url,
-      courseCategorieId: c.course_categorie_id,
-      isInSale: c.is_in_sale === true,
-      syllabus: Array.isArray(c.syllabus) ? c.syllabus.join("\n") : (c.syllabus || null),
-      isPlacementGurranted: c.is_placement_gurranted === true,
-      courseCategorie: categoryMap.get(c.course_categorie_id) || null,
-    };
-  });
-}
-
 export default class CourseService {
   async getCourseCategories(): Promise<CourseCategory[]> {
     try {
@@ -152,10 +116,10 @@ export default class CourseService {
         return response.data;
       }
     } catch {
-      // Backend is unavailable, use local fallback
+      // Backend is unavailable
     }
 
-    return getFallbackCategories();
+    return [];
   }
 
   async getCourses(): Promise<Course[]> {
@@ -166,10 +130,10 @@ export default class CourseService {
         return response.data.map(parseCourse);
       }
     } catch {
-      // Backend is unavailable, use local fallback
+      // Backend is unavailable
     }
 
-    return getFallbackCourses();
+    return [];
   }
 
   async getCourseById(id: string): Promise<Course | null> {
@@ -187,11 +151,10 @@ export default class CourseService {
       if (error instanceof ApiRequestError && error.status === 404) {
         return null;
       }
-      // Backend is unavailable, use local fallback
+      // Backend is unavailable
     }
 
-    const localCourse = getFallbackCourses().find((c) => c.id === id);
-    return localCourse || null;
+    return null;
   }
 }
 

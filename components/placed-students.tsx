@@ -1,15 +1,6 @@
-"use client";
-
 import React from "react";
 import Image from "next/image";
-import testimonialsData from "@/testimonials.json";
-
-export interface StudentTestimonial {
-  id: string;
-  name: string;
-  profile_img: string;
-  company_name: string;
-}
+import { testimonialService, type StudentTestimonial } from "@/services/TestimonialService";
 
 function StudentCard({ student }: { student: StudentTestimonial }) {
   return (
@@ -39,16 +30,21 @@ function StudentCard({ student }: { student: StudentTestimonial }) {
   );
 }
 
-export default function PlacedStudents() {
-  const allStudents = testimonialsData.testimonials as StudentTestimonial[];
+export default async function PlacedStudents() {
+  const allStudents = await testimonialService.getTestimonials();
 
-  // Split into 2 rows of 10 students each
-  const row1 = allStudents.slice(0, 10);
-  const row2 = allStudents.slice(10, 20);
+  if (!allStudents || allStudents.length === 0) {
+    return null;
+  }
+
+  // Split into 2 rows
+  const half = Math.ceil(allStudents.length / 2);
+  const row1 = allStudents.slice(0, half);
+  const row2 = allStudents.slice(half);
 
   // Duplicate arrays for infinite seamless looping
   const row1Duplicated = [...row1, ...row1];
-  const row2Duplicated = [...row2, ...row2];
+  const row2Duplicated = row2.length > 0 ? [...row2, ...row2] : row1Duplicated;
 
   return (
     <section className="relative w-full py-14 overflow-hidden border-t border-neutral-200 bg-neutral-50/50 dark:border-neutral-800 dark:bg-neutral-950/40">
@@ -127,13 +123,15 @@ export default function PlacedStudents() {
         </div>
 
         {/* Row 2: Animates from Right to Left */}
-        <div className="flex w-full overflow-hidden">
-          <div className="marquee-track-rtl flex gap-4">
-            {row2Duplicated.map((student, idx) => (
-              <StudentCard key={`r2-${student.id}-${idx}`} student={student} />
-            ))}
+        {row2.length > 0 && (
+          <div className="flex w-full overflow-hidden">
+            <div className="marquee-track-rtl flex gap-4">
+              {row2Duplicated.map((student, idx) => (
+                <StudentCard key={`r2-${student.id}-${idx}`} student={student} />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );

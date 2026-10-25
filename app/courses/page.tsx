@@ -73,29 +73,30 @@ async function CoursesContent() {
 async function CoursesHero() {
   const pageData = await pageService.getPageByRoute("courses");
 
+  if (!pageData?.heading && !pageData?.subheading) {
+    return null;
+  }
+
   return (
     <section className="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-950/40 py-5 sm:py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl text-neutral-900 dark:text-white max-w-4xl">
-          {pageData?.heading ? (
-            pageData.heading
+        {pageData.heading && (
+          pageData.heading.includes("<") ? (
+            <h1
+              className="text-3xl sm:text-4xl md:text-5xl text-neutral-900 dark:text-white max-w-4xl"
+              dangerouslySetInnerHTML={{ __html: pageData.heading }}
+            />
           ) : (
-            <>
-              Learn{" "}
-              <span className="text-[#1550A5] dark:text-blue-400">
-                AI-Powered Modern Tech Courses
-              </span>{" "}
-              with{" "}
-              <span className="text-[#F58216]">
-                Real MNC Developers
-              </span>
-            </>
-          )}
-        </h1>
-        <p className="mt-4 text-base sm:text-lg text-neutral-600 dark:text-neutral-400 max-w-3xl leading-relaxed">
-          {pageData?.subheading ||
-            "Industry-designed bootcamps and specialization tracks built to take you from foundational concepts to production-grade engineering. Get live 1-on-1 code reviews, system design mentorship, and dedicated placement assistance."}
-        </p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl text-neutral-900 dark:text-white max-w-4xl">
+              {pageData.heading}
+            </h1>
+          )
+        )}
+        {pageData.subheading && (
+          <p className="mt-4 text-base sm:text-lg text-neutral-600 dark:text-neutral-400 max-w-3xl leading-relaxed">
+            {pageData.subheading}
+          </p>
+        )}
       </div>
     </section>
   );
@@ -104,20 +105,9 @@ async function CoursesHero() {
 function CoursesHeroSkeleton() {
   return (
     <section className="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-950/40 py-5 sm:py-10">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl text-neutral-900 dark:text-white max-w-4xl">
-          Learn{" "}
-          <span className="text-[#1550A5] dark:text-blue-400">
-            AI-Powered Modern Tech Courses
-          </span>{" "}
-          with{" "}
-          <span className="text-[#F58216]">
-            Real MNC Developers
-          </span>
-        </h1>
-        <p className="mt-4 text-base sm:text-lg text-neutral-600 dark:text-neutral-400 max-w-3xl leading-relaxed">
-          Industry-designed bootcamps and specialization tracks built to take you from foundational concepts to production-grade engineering. Get live 1-on-1 code reviews, system design mentorship, and dedicated placement assistance.
-        </p>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-3">
+        <div className="h-10 w-2/3 rounded-lg bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
+        <div className="h-5 w-1/2 rounded-lg bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
       </div>
     </section>
   );

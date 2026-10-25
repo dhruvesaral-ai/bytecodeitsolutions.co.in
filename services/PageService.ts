@@ -21,29 +21,11 @@ function isPageData(value: unknown): value is PageData {
   );
 }
 
-export const DEFAULT_PAGES: PageData[] = [
-  {
-    id: "default-courses",
-    heading: "Learn AI-Powered Modern Tech Courses with Real MNC Developers",
-    subheading:
-      "Industry-designed bootcamps and specialization tracks built to take you from foundational concepts to production-grade engineering. Get live 1-on-1 code reviews, system design mentorship, and dedicated placement assistance.",
-    routeName: "courses",
-  },
-  {
-    id: "default-home",
-    heading: "We Develop Technology & We Train Talent",
-    subheading:
-      "Building digital solutions for businesses and developing the next generation of tech professionals through practical, industry-focused training.",
-    routeName: "home",
-  },
-];
-
 export default class PageService {
   async getPages(): Promise<PageData[]> {
     try {
       const response = await get<{ data?: unknown[] }>("pages");
       if (response && isRecord(response) && Array.isArray(response.data)) {
-        
         return response.data.filter(isPageData);
       }
     } catch {
@@ -69,10 +51,7 @@ export default class PageService {
       // Backend is unavailable or route not found
     }
 
-    const fallback = DEFAULT_PAGES.find(
-      (p) => p.routeName.toLowerCase() === routeName.toLowerCase()
-    );
-    return fallback || null;
+    return null;
   }
 }
 
