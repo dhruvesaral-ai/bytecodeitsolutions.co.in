@@ -8,8 +8,6 @@ import {
   ShieldCheck,
   Headphones,
   ArrowRight,
-  Sparkles,
-  Award,
 } from "lucide-react";
 import type { Course } from "@/services/CourseService";
 
@@ -95,111 +93,10 @@ function formatPriceINR(amount: number): string {
   }).format(amount);
 }
 
-// Fallback cohort matching user screenshot if fewer than 3 are present in the DB
-const SUPPLEMENTAL_COHORT: Course = {
-  id: "data-science-analytics-gen-ai",
-  name: "Data Science & Analytics with Gen AI",
-  shortDescription:
-    "Gain hands-on experience in data analysis, visualization, modern machine learning pipelines, and AI integration with direct placement support.",
-  longDescription: "",
-  originalPrice: 19998,
-  discountedPrice: 9799,
-  rating: 4.9,
-  technologyTags: ["Python", "PowerBI", "SQL", "Gen AI", "Machine Learning", "Excel"],
-  duration: "5+ Months",
-  status: "active",
-  courseImgUrl:
-    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80",
-  courseCategorieId: "cmvo9fyao0006ll3tgks2a7ul",
-  isInSale: true,
-  syllabus: null,
-  isPlacementGurranted: true,
-  courseCategorie: {
-    id: "cmvo9fyao0006ll3tgks2a7ul",
-    name: "100% Placement Opportunity Guaranteed Courses",
-    slug: "100%-placement-opportunity-guaranteed-courses",
-  },
-};
-
 export default function PlacementGuaranteedSection({
   courses,
 }: PlacementGuaranteedSectionProps) {
-  // Build card deck: DB placement courses + supplementary if needed to match screenshot trio
-  const displayCourses: Course[] = React.useMemo(() => {
-    const list = [...courses];
-    if (list.length === 0) {
-      // Offline fallback
-      return [
-        {
-          id: "cmvoah7t70001dx3th0jdzoqk",
-          name: "100% Placement Opportunity Guranteed AI Powered Cohort (JAVA): Complete Web, App Development + DSA + Gen-AI + Aptitude",
-          shortDescription:
-            "Master AI-powered Java Software Engineering with complete Web & App Development, DevOps, and System Design. Learn Java, Spring Boot, DSA, and modern AI tools.",
-          longDescription: "",
-          originalPrice: 70000,
-          discountedPrice: 55000,
-          rating: 5,
-          technologyTags: [
-            "Java",
-            "Spring Boot",
-            "Full Stack",
-            "DSA",
-            "System Design",
-            "Gen-AI",
-            "Docker",
-            "AWS",
-          ],
-          duration: "18 Months",
-          status: "active",
-          courseImgUrl:
-            "https://admin.bytecode.co.in/uploads/images/1792962836095-AI-Powered-Full-Stack-Java-Course-Banner-1.png",
-          courseCategorieId: "cmvo9fyao0006ll3tgks2a7ul",
-          isInSale: true,
-          syllabus: null,
-          isPlacementGurranted: true,
-          courseCategorie: null,
-        },
-        SUPPLEMENTAL_COHORT,
-        {
-          id: "cmvoaf6x20000dx3tg8gref7b",
-          name: "100% Placement Opportunity Guranteed AI Powered Cohort (JAVASCRIPT): Complete Web, App Development + DSA + Gen-AI + Aptitude",
-          shortDescription:
-            "Master AI-powered Software Engineering with complete Web & App Development and DevOps. Learn modern technologies, build real-world products, and prepare for top tech roles.",
-          longDescription: "",
-          originalPrice: 65000,
-          discountedPrice: 50000,
-          rating: 5,
-          technologyTags: [
-            "JavaScript",
-            "React",
-            "Next.js",
-            "Node.js",
-            "TypeScript",
-            "Gen-AI",
-            "DevOps",
-          ],
-          duration: "18 Months",
-          status: "active",
-          courseImgUrl:
-            "https://admin.bytecode.co.in/uploads/images/1792962855659-AI-Powered-JavaScript-Engineering-Course.png",
-          courseCategorieId: "cmvo9fyao0006ll3tgks2a7ul",
-          isInSale: true,
-          syllabus: null,
-          isPlacementGurranted: true,
-          courseCategorie: null,
-        },
-      ];
-    }
-
-    // If 2 courses from DB, inject Data Science cohort in between or as 2nd card to replicate the Orange Card in Image 2
-    if (list.length === 2) {
-      return [list[0], SUPPLEMENTAL_COHORT, list[1]];
-    }
-
-    return list;
-  }, [courses]);
-
-  if (displayCourses.length === 0) {
+  if (!courses || courses.length === 0) {
     return null;
   }
 
@@ -209,16 +106,16 @@ export default function PlacementGuaranteedSection({
       aria-labelledby="placement-section-heading"
       className="relative w-full py-16 sm:py-24 border-y transition-colors duration-300 bg-[#0C0D14] text-white border-neutral-800/80 dark:bg-[#FAF4EE] dark:text-neutral-900 dark:border-amber-900/10 rounded-tl-[50px] rounded-tr-[50px] overflow-visible"
     >
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto w-[90%] px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-7xl mx-auto mb-12 sm:mb-16">
 
           <h2
             id="placement-section-heading"
-            className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-tight text-white dark:text-neutral-900"
+            className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl text-white dark:text-neutral-900"
           >
             Wanted to get a <strong>Job</strong>?<br></br>
-            <span className="block mt-1 sm:mt-2">We&apos;re Here To Help.</span>
+            <span className="block">We&apos;re Here To Help.</span>
           </h2>
 
           <p className="mt-4 text-sm sm:text-base text-neutral-300 dark:text-neutral-600 leading-relaxed max-w-2xl mx-auto">
@@ -248,19 +145,17 @@ export default function PlacementGuaranteedSection({
           3. Card 2 (z-12) slides smoothly OVER Card 1 (z-11).
           4. Stepped top offsets (80px, 104px, 128px...) ensure the top of previously stacked cards peek out like a real card deck!
         */}
-        <div className="relative max-w-6xl mx-auto space-y-12 sm:space-y-16 pb-24 sm:pb-36">
-          {displayCourses.map((course, index) => {
+        <div className="relative w-full mx-auto space-y-12 sm:space-y-16 pb-24 sm:pb-36">
+          {courses.map((course, index) => {
             const theme = CARD_THEMES[index % CARD_THEMES.length];
-            const isReversed = index % 2 === 1; // Alternating layout like Image 1 & 2
-            const courseHref = course.id.startsWith("cmv")
-              ? `/courses/${course.id}`
-              : `/courses`;
+            const isReversed = index % 2 === 1; // Alternating layout
+            const courseHref = `/courses/${course.id}`;
 
             const durationDisplay = course.duration
               ? course.duration.toLowerCase().includes("month")
                 ? course.duration
                 : `${course.duration} Months`
-              : "6+ Months";
+              : "";
 
             return (
               <div
@@ -279,26 +174,30 @@ export default function PlacementGuaranteedSection({
                       }`}
                   >
                     {/* Media Column (Image & Live Badge) */}
-                    <div className="lg:col-span-5 w-full">
-                      <div className="relative aspect-[16/10] sm:aspect-video lg:aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-lg bg-neutral-900 group">
+                    <div className="lg:col-span-4 xl:col-span-4 w-full flex justify-center">
+                      <div className="relative aspect-[9/16] w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[340px] xl:max-w-[360px] rounded-2xl overflow-hidden shadow-xl bg-neutral-900 group">
                         <Image
                           src={course.courseImgUrl}
                           alt={course.name}
                           fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
+                          sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 360px"
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          priority={index === 0}
                           unoptimized
                         />
 
+                        {/* Top Gradient for Badge Readability */}
+                        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/70 via-black/25 to-transparent pointer-events-none" />
+
                         {/* Top Badges Overlay */}
-                        <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-600 text-white shadow-md">
+                        <div className="absolute top-3 left-3 right-3 flex flex-wrap items-center justify-between gap-2 pointer-events-none z-10">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-600 text-white shadow-md backdrop-blur-xs">
                             <ShieldCheck className="size-3.5" />
                             <span>100% Placement Assured</span>
                           </span>
 
                           {course.isInSale && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-[#F58216] text-white tracking-wide uppercase">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-[#F58216] text-white tracking-wide uppercase shadow-md">
                               Active Cohort
                             </span>
                           )}
@@ -307,20 +206,7 @@ export default function PlacementGuaranteedSection({
                     </div>
 
                     {/* Content Column */}
-                    <div className="lg:col-span-7 flex flex-col justify-between space-y-5">
-                      {/* Category & Verified Badge */}
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ${theme.badgeClass}`}
-                        >
-                          <Award className="size-3" />
-                          <span>Guaranteed Placement Career Track</span>
-                        </span>
-
-                        <span className="text-xs font-semibold opacity-75">
-                          ★ {course.rating.toFixed(1)} / 5.0
-                        </span>
-                      </div>
+                    <div className="lg:col-span-8 xl:col-span-8 flex flex-col justify-between space-y-5">
 
                       {/* Title */}
                       <h3
@@ -335,25 +221,41 @@ export default function PlacementGuaranteedSection({
                       </h3>
 
                       {/* Description */}
-                      <p
-                        className={`text-xs sm:text-sm lg:text-base leading-relaxed line-clamp-2 sm:line-clamp-3 ${theme.descriptionColor}`}
-                      >
-                        {course.shortDescription}
-                      </p>
-
-                      {/* 3 Key Stats / Feature Badges (Matching Image 2) */}
-                      <div className="grid grid-cols-3 gap-2 sm:gap-3 py-1">
-                        <div
-                          className={`flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs sm:text-sm font-medium ${theme.pillClass}`}
+                      {(course.shortDescription || course.longDescription) && (
+                        <p
+                          className={`text-xs sm:text-sm lg:text-base leading-relaxed line-clamp-2 sm:line-clamp-3 ${theme.descriptionColor}`}
                         >
-                          <Clock className="size-4 shrink-0 opacity-80" />
-                          <div className="min-w-0">
-                            <p className="font-bold truncate">{durationDisplay}</p>
-                            <p className="text-[10px] opacity-70 truncate hidden sm:block">
-                              Curriculum
-                            </p>
+                          {course.shortDescription || course.longDescription}
+                        </p>
+                      )}
+
+                      {/* 3 Key Stats / Feature Badges */}
+                      <div className="grid grid-cols-3 gap-2 sm:gap-3 py-1">
+                        {durationDisplay ? (
+                          <div
+                            className={`flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs sm:text-sm font-medium ${theme.pillClass}`}
+                          >
+                            <Clock className="size-4 shrink-0 opacity-80" />
+                            <div className="min-w-0">
+                              <p className="font-bold truncate">{durationDisplay}</p>
+                              <p className="text-[10px] opacity-70 truncate hidden sm:block">
+                                Curriculum
+                              </p>
+                            </div>
                           </div>
-                        </div>
+                        ) : (
+                          <div
+                            className={`flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs sm:text-sm font-medium ${theme.pillClass}`}
+                          >
+                            <Clock className="size-4 shrink-0 opacity-80" />
+                            <div className="min-w-0">
+                              <p className="font-bold truncate">Comprehensive</p>
+                              <p className="text-[10px] opacity-70 truncate hidden sm:block">
+                                Curriculum
+                              </p>
+                            </div>
+                          </div>
+                        )}
 
                         <div
                           className={`flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs sm:text-sm font-medium ${theme.pillClass}`}
@@ -379,25 +281,6 @@ export default function PlacementGuaranteedSection({
                           </div>
                         </div>
                       </div>
-
-                      {/* Technology Chips */}
-                      {course.technologyTags && course.technologyTags.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                          {course.technologyTags.slice(0, 5).map((tech) => (
-                            <span
-                              key={tech}
-                              className={`text-[11px] font-medium px-2 py-0.5 rounded-md ${theme.pillClass}`}
-                            >
-                              {tech}
-                            </span>
-                          ))}
-                          {course.technologyTags.length > 5 && (
-                            <span className="text-[10px] font-medium opacity-70">
-                              +{course.technologyTags.length - 5} more
-                            </span>
-                          )}
-                        </div>
-                      )}
 
                       {/* Price & Action Button (Matching Image 2) */}
                       <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-current/10">
