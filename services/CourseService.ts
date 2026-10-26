@@ -101,7 +101,10 @@ function parseCourse(value: unknown, index: number): Course {
 
 function resolveMediaUrl(url: string): string {
   try {
-    return new URL(url, `${MEDIA_BASE_URL.replace(/\/+$/, "")}/`).toString();
+    const base = MEDIA_BASE_URL.includes("localhost:3001")
+      ? "https://admin.bytecode.co.in"
+      : MEDIA_BASE_URL;
+    return new URL(url, `${base.replace(/\/+$/, "")}/`).toString();
   } catch {
     throw new Error(`Invalid course image URL: ${url}`);
   }

@@ -30,7 +30,9 @@
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-poppins), sans-serif;
+  --font-sans: var(--font-neue-machina), var(--font-poppins), sans-serif;
+  --font-machina: var(--font-neue-machina);
+  --font-neue-machina: var(--font-neue-machina);
   --font-poppins: var(--font-poppins);
 }
 
@@ -51,7 +53,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-poppins), sans-serif;
+  font-family: var(--font-neue-machina), var(--font-poppins), sans-serif;
 }
 
 /* Swiper Custom Pagination */
