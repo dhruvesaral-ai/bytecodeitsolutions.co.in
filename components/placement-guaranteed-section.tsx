@@ -185,23 +185,6 @@ export default function PlacementGuaranteedSection({
                           priority={index === 0}
                           unoptimized
                         />
-
-                        {/* Top Gradient for Badge Readability */}
-                        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/70 via-black/25 to-transparent pointer-events-none" />
-
-                        {/* Top Badges Overlay */}
-                        <div className="absolute top-3 left-3 right-3 flex flex-wrap items-center justify-between gap-2 pointer-events-none z-10">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-600 text-white shadow-md backdrop-blur-xs">
-                            <ShieldCheck className="size-3.5" />
-                            <span>100% Placement Assured</span>
-                          </span>
-
-                          {course.isInSale && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-[#F58216] text-white tracking-wide uppercase shadow-md">
-                              Active Cohort
-                            </span>
-                          )}
-                        </div>
                       </div>
                     </div>
 
