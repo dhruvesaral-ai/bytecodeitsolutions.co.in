@@ -7,7 +7,7 @@ import { SettingsProvider } from "@/context/setting-context";
 import SmoothScroll from "@/components/smooth-scroll";
 import Header from "@/components/header";
 import { pageService } from "@/services/PageService";
-import { settingService } from "@/services/SettingService";
+import { getCachedSettings } from "@/lib/cached-settings";
 import "./globals.css";
 import Footer from "@/components/footer";
 
@@ -90,7 +90,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const settings = await settingService.getSettings();
+  const settings = await getCachedSettings();
 
   return (
     <html
