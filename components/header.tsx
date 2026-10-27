@@ -65,7 +65,16 @@ interface HeaderProps {
 export default function Header({ initialPages }: HeaderProps = {}) {
   const pathname = usePathname();
   const { resolvedTheme, toggleTheme } = useTheme();
-  const { companyName } = useSettings();
+  const {
+    companyName,
+    companyLightThemedLogoUrl,
+    companyDarkThemedLogoUrl,
+  } = useSettings();
+  const displayName = companyName || "Bytecode IT Solutions";
+  const lightLogo =
+    companyLightThemedLogoUrl || "/bytecode-light-theme-logo.png";
+  const darkLogo =
+    companyDarkThemedLogoUrl || "/bytecode-dark-theme-logo.png";
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
@@ -121,22 +130,24 @@ export default function Header({ initialPages }: HeaderProps = {}) {
           <Link
             href="/"
             className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] rounded-md"
-            aria-label={`${companyName} Home`}
+            aria-label={`${displayName} Home`}
           >
             <Image
-              src="/bytecode-light-theme-logo.png"
-              alt={companyName}
+              src={lightLogo}
+              alt={displayName}
               width={200}
               height={67}
               priority
+              unoptimized={Boolean(companyLightThemedLogoUrl)}
               className="h-9 w-auto object-contain dark:hidden"
             />
             <Image
-              src="/bytecode-dark-theme-logo.png"
-              alt={companyName}
+              src={darkLogo}
+              alt={displayName}
               width={200}
               height={67}
               priority
+              unoptimized={Boolean(companyDarkThemedLogoUrl)}
               className="hidden h-9 w-auto object-contain dark:block"
             />
           </Link>
@@ -258,17 +269,19 @@ export default function Header({ initialPages }: HeaderProps = {}) {
         <div className="flex h-16 items-center justify-between px-5 border-b border-neutral-200 dark:border-neutral-800">
           <div className="flex items-center">
             <Image
-              src="/bytecode-light-theme-logo.png"
-              alt={companyName}
+              src={lightLogo}
+              alt={displayName}
               width={160}
               height={53}
+              unoptimized={Boolean(companyLightThemedLogoUrl)}
               className="h-8 w-auto object-contain dark:hidden"
             />
             <Image
-              src="/bytecode-dark-theme-logo.png"
-              alt={companyName}
+              src={darkLogo}
+              alt={displayName}
               width={160}
               height={53}
+              unoptimized={Boolean(companyDarkThemedLogoUrl)}
               className="hidden h-8 w-auto object-contain dark:block"
             />
           </div>

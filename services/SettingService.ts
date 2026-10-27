@@ -1,131 +1,99 @@
+import { MEDIA_BASE_URL } from "@/config";
 import { get } from "@/lib/api-method";
-
-export interface SettingAddress {
-  id?: string;
-  addressLine: string;
-  pincode: string;
-  city: string;
-  state: string;
-  country: string;
-}
 
 export interface SettingData {
   id: string;
   companyName: string;
+  companyLightThemedLogoUrl?: string | null;
+  companyDarkThemedLogoUrl?: string | null;
   companyAddress: string;
-  companyAddressId?: string;
   companyWhatsappNumber: string;
   companyPrimaryContactNumber: string;
   companySecondaryContactNumber?: string;
   createdAt?: string;
   updatedAt?: string;
-  address?: SettingAddress | null;
   email?: string;
 }
-
-export const DEFAULT_SETTINGS: SettingData = {
-  id: "set_cm101abc",
-  companyName: "Bytecode IT Solutions",
-  companyAddress: "2nd Floor, MG Road, Indore, Madhya Pradesh 452001",
-  companyWhatsappNumber: "+919876543210",
-  companyPrimaryContactNumber: "+919876543211",
-  companySecondaryContactNumber: "+919876543212",
-  createdAt: "2026-10-27T12:00:00.000Z",
-  updatedAt: "2026-10-27T12:00:00.000Z",
-  email: "contact@bytecode.co.in",
-};
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+function resolveMediaUrl(url: string): string {
+  try {
+    return new URL(url, `${MEDIA_BASE_URL.replace(/\/+$/, "")}/`).toString();
+  } catch {
+    return url;
+  }
+}
+
 function parseSettingItem(item: unknown): SettingData | null {
   if (!isRecord(item)) return null;
 
-  const id = typeof item.id === "string" ? item.id : DEFAULT_SETTINGS.id;
+  const id = typeof item.id === "string" ? item.id : "";
   const companyName =
-    typeof item.companyName === "string" && item.companyName.trim()
-      ? item.companyName
-      : DEFAULT_SETTINGS.companyName;
+    typeof item.companyName === "string" ? item.companyName.trim() : "";
+
+  let companyLightThemedLogoUrl: string | null = null;
+  if (
+    typeof item.companyLightThemedLogoUrl === "string" &&
+    item.companyLightThemedLogoUrl.trim()
+  ) {
+    companyLightThemedLogoUrl = resolveMediaUrl(
+      item.companyLightThemedLogoUrl.trim()
+    );
+  }
+
+  let companyDarkThemedLogoUrl: string | null = null;
+  if (
+    typeof item.companyDarkThemedLogoUrl === "string" &&
+    item.companyDarkThemedLogoUrl.trim()
+  ) {
+    companyDarkThemedLogoUrl = resolveMediaUrl(
+      item.companyDarkThemedLogoUrl.trim()
+    );
+  }
 
   const companyWhatsappNumber =
-    typeof item.companyWhatsappNumber === "string" &&
-    item.companyWhatsappNumber.trim()
-      ? item.companyWhatsappNumber
-      : DEFAULT_SETTINGS.companyWhatsappNumber;
+    typeof item.companyWhatsappNumber === "string"
+      ? item.companyWhatsappNumber.trim()
+      : "";
 
   const companyPrimaryContactNumber =
-    typeof item.companyPrimaryContactNumber === "string" &&
-    item.companyPrimaryContactNumber.trim()
-      ? item.companyPrimaryContactNumber
-      : DEFAULT_SETTINGS.companyPrimaryContactNumber;
+    typeof item.companyPrimaryContactNumber === "string"
+      ? item.companyPrimaryContactNumber.trim()
+      : "";
 
   const companySecondaryContactNumber =
-    typeof item.companySecondaryContactNumber === "string" &&
-    item.companySecondaryContactNumber.trim()
-      ? item.companySecondaryContactNumber
-      : DEFAULT_SETTINGS.companySecondaryContactNumber;
-
-  const companyAddressId =
-    typeof item.companyAddressId === "string"
-      ? item.companyAddressId
+    typeof item.companySecondaryContactNumber === "string"
+      ? item.companySecondaryContactNumber.trim()
       : undefined;
 
   const email =
     typeof item.email === "string" && item.email.trim()
-      ? item.email
-      : DEFAULT_SETTINGS.email;
+      ? item.email.trim()
+      : undefined;
 
-  let address: SettingAddress | undefined = undefined;
-  if (isRecord(item.address)) {
-    address = {
-      id: typeof item.address.id === "string" ? item.address.id : undefined,
-      addressLine:
-        typeof item.address.addressLine === "string"
-          ? item.address.addressLine
-          : "",
-      pincode:
-        typeof item.address.pincode === "string" ? item.address.pincode : "",
-      city: typeof item.address.city === "string" ? item.address.city : "",
-      state: typeof item.address.state === "string" ? item.address.state : "",
-      country:
-        typeof item.address.country === "string" ? item.address.country : "",
-    };
-  }
-
-  let companyAddress = DEFAULT_SETTINGS.companyAddress;
-  if (typeof item.companyAddress === "string" && item.companyAddress.trim()) {
-    companyAddress = item.companyAddress.trim();
-  } else if (address) {
-    const parts = [
-      address.addressLine,
-      address.city,
-      address.state,
-      address.pincode,
-      address.country,
-    ].filter(Boolean);
-    if (parts.length > 0) {
-      companyAddress = parts.join(", ");
-    }
-  }
+  const companyAddress =
+    typeof item.companyAddress === "string" ? item.companyAddress.trim() : "";
 
   return {
     id,
     companyName,
+    companyLightThemedLogoUrl,
+    companyDarkThemedLogoUrl,
     companyAddress,
-    companyAddressId,
     companyWhatsappNumber,
     companyPrimaryContactNumber,
     companySecondaryContactNumber,
     createdAt: typeof item.createdAt === "string" ? item.createdAt : undefined,
     updatedAt: typeof item.updatedAt === "string" ? item.updatedAt : undefined,
-    address,
     email,
   };
 }
 
 export class SettingService {
-  async getSettings(): Promise<SettingData> {
+  async getSettings(): Promise<SettingData | null> {
     try {
       const response = await get<{ data?: unknown }>("settings");
       if (response && isRecord(response) && response.data !== undefined) {
@@ -143,7 +111,7 @@ export class SettingService {
     } catch {
       // Backend is unavailable or error fetching settings
     }
-    return DEFAULT_SETTINGS;
+    return null;
   }
 }
 

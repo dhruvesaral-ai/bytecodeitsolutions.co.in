@@ -8,16 +8,13 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import {
-  SettingData,
-  SettingAddress,
-  DEFAULT_SETTINGS,
-  settingService,
-} from "@/services/SettingService";
+import { SettingData, settingService } from "@/services/SettingService";
 
 export interface SettingContextType {
-  settings: SettingData;
+  settings: SettingData | null;
   companyName: string;
+  companyLightThemedLogoUrl: string | null;
+  companyDarkThemedLogoUrl: string | null;
   companyAddress: string;
   formattedAddress: string;
   companyWhatsappNumber: string;
@@ -25,7 +22,6 @@ export interface SettingContextType {
   companyPrimaryContactNumber: string;
   companySecondaryContactNumber?: string;
   phoneNumbers: string[];
-  address: SettingAddress | null | undefined;
   email: string;
   isLoading: boolean;
   getWhatsappUrl: (message?: string) => string;
@@ -36,21 +32,6 @@ export interface SettingContextType {
 export const SettingContext = createContext<SettingContextType | undefined>(
   undefined
 );
-
-export function formatAddress(address?: SettingAddress | null): string {
-  if (!address) return "";
-  const parts: string[] = [];
-  if (address.addressLine) parts.push(address.addressLine);
-  if (address.city) parts.push(address.city);
-  if (address.state && address.pincode) {
-    parts.push(`${address.state} - ${address.pincode}`);
-  } else {
-    if (address.state) parts.push(address.state);
-    if (address.pincode) parts.push(address.pincode);
-  }
-  if (address.country) parts.push(address.country);
-  return parts.join(", ");
-}
 
 export function formatPhoneNumber(phone: string): string {
   if (!phone) return "";
@@ -78,39 +59,39 @@ interface SettingsProviderProps {
 
 export function SettingsProvider({
   children,
-  initialSettings,
+  initialSettings = null,
 }: SettingsProviderProps) {
-  const [settings, setSettings] = useState<SettingData>(
-    initialSettings || DEFAULT_SETTINGS
-  );
+  const [settings, setSettings] = useState<SettingData | null>(initialSettings);
   const [isLoading, setIsLoading] = useState<boolean>(!initialSettings);
 
   const refreshSettings = useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await settingService.getSettings();
-      setSettings(data);
+      if (data) {
+        setSettings(data);
+      }
     } catch {
-      // Retain existing settings if network fails
+      // Backend is unavailable or error fetching settings
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    // If no initial settings were provided from server, fetch on client mount
-    if (!initialSettings) {
-      refreshSettings();
-    }
-  }, [initialSettings, refreshSettings]);
+    refreshSettings();
+  }, [refreshSettings]);
 
-  const companyName = settings.companyName || DEFAULT_SETTINGS.companyName;
-  const companyWhatsappNumber =
-    settings.companyWhatsappNumber || DEFAULT_SETTINGS.companyWhatsappNumber;
+  const companyName = settings?.companyName || "";
+  const companyLightThemedLogoUrl =
+    settings?.companyLightThemedLogoUrl || null;
+  const companyDarkThemedLogoUrl =
+    settings?.companyDarkThemedLogoUrl || null;
+  const companyWhatsappNumber = settings?.companyWhatsappNumber || "";
   const companyPrimaryContactNumber =
-    settings.companyPrimaryContactNumber ||
-    DEFAULT_SETTINGS.companyPrimaryContactNumber;
-  const companySecondaryContactNumber = settings.companySecondaryContactNumber;
+    settings?.companyPrimaryContactNumber || "";
+  const companySecondaryContactNumber =
+    settings?.companySecondaryContactNumber || undefined;
 
   const cleanWhatsappNumber = useMemo(() => {
     return companyWhatsappNumber.replace(/\D/g, "");
@@ -127,26 +108,14 @@ export function SettingsProvider({
     ) {
       numbers.push(companySecondaryContactNumber);
     }
-    return numbers.length > 0
-      ? numbers
-      : [DEFAULT_SETTINGS.companyPrimaryContactNumber];
+    return numbers;
   }, [companyPrimaryContactNumber, companySecondaryContactNumber]);
 
-  const address = settings.address;
-
-  const companyAddress = useMemo(() => {
-    if (settings.companyAddress && settings.companyAddress.trim()) {
-      return settings.companyAddress;
-    }
-    if (address) {
-      return formatAddress(address);
-    }
-    return DEFAULT_SETTINGS.companyAddress;
-  }, [settings.companyAddress, address]);
+  const companyAddress = settings?.companyAddress?.trim() ?? "";
 
   const formattedAddress = companyAddress;
 
-  const email = settings.email || DEFAULT_SETTINGS.email || "contact@bytecode.co.in";
+  const email = settings?.email || "";
 
   const getWhatsappUrl = useCallback(
     (message?: string) => {
@@ -162,6 +131,8 @@ export function SettingsProvider({
     () => ({
       settings,
       companyName,
+      companyLightThemedLogoUrl,
+      companyDarkThemedLogoUrl,
       companyAddress,
       formattedAddress,
       companyWhatsappNumber,
@@ -169,7 +140,6 @@ export function SettingsProvider({
       companyPrimaryContactNumber,
       companySecondaryContactNumber,
       phoneNumbers,
-      address,
       email,
       isLoading,
       getWhatsappUrl,
@@ -179,6 +149,8 @@ export function SettingsProvider({
     [
       settings,
       companyName,
+      companyLightThemedLogoUrl,
+      companyDarkThemedLogoUrl,
       companyAddress,
       formattedAddress,
       companyWhatsappNumber,
@@ -186,7 +158,6 @@ export function SettingsProvider({
       companyPrimaryContactNumber,
       companySecondaryContactNumber,
       phoneNumbers,
-      address,
       email,
       isLoading,
       getWhatsappUrl,

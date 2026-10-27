@@ -7,6 +7,7 @@ import { SettingsProvider } from "@/context/setting-context";
 import SmoothScroll from "@/components/smooth-scroll";
 import Header from "@/components/header";
 import { pageService } from "@/services/PageService";
+import { settingService } from "@/services/SettingService";
 import "./globals.css";
 import Footer from "@/components/footer";
 
@@ -84,11 +85,13 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const settings = await settingService.getSettings();
+
   return (
     <html
       lang="en"
@@ -114,7 +117,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white">
         <ThemeProvider>
-          <SettingsProvider>
+          <SettingsProvider initialSettings={settings}>
             <Suspense
               fallback={
                 <div

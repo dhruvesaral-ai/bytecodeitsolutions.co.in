@@ -10,12 +10,20 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   const {
     companyName,
+    companyLightThemedLogoUrl,
+    companyDarkThemedLogoUrl,
     cleanWhatsappNumber,
     phoneNumbers,
     formattedAddress,
     email,
     formatPhoneNumber,
   } = useSettings();
+
+  const displayName = companyName || "Bytecode IT Solutions";
+  const lightLogo =
+    companyLightThemedLogoUrl || "/bytecode-light-theme-logo.png";
+  const darkLogo =
+    companyDarkThemedLogoUrl || "/bytecode-dark-theme-logo.png";
 
   return (
     <footer className="w-full border-t border-neutral-200 bg-neutral-50 text-neutral-600 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-400">
@@ -26,20 +34,22 @@ export default function Footer() {
             <Link
               href="/"
               className="inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] rounded-md"
-              aria-label={companyName}
+              aria-label={displayName}
             >
               <Image
-                src="/bytecode-light-theme-logo.png"
-                alt={companyName}
+                src={lightLogo}
+                alt={displayName}
                 width={180}
                 height={60}
+                unoptimized={Boolean(companyLightThemedLogoUrl)}
                 className="h-8 w-auto object-contain dark:hidden"
               />
               <Image
-                src="/bytecode-dark-theme-logo.png"
-                alt={companyName}
+                src={darkLogo}
+                alt={displayName}
                 width={180}
                 height={60}
+                unoptimized={Boolean(companyDarkThemedLogoUrl)}
                 className="hidden h-8 w-auto object-contain dark:block"
               />
             </Link>
@@ -50,17 +60,19 @@ export default function Footer() {
             </p>
 
             {/* Direct WhatsApp Action */}
-            <div className="pt-2">
-              <a
-                href={cleanWhatsappNumber ? `https://wa.me/${cleanWhatsappNumber}` : "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-md bg-[#1550A5] px-3.5 py-2 text-xs font-medium text-white transition-colors hover:bg-[#124288] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5]"
-              >
-                <MessageSquare className="size-3.5" />
-                <span>Chat on WhatsApp</span>
-              </a>
-            </div>
+            {cleanWhatsappNumber && (
+              <div className="pt-2">
+                <a
+                  href={`https://wa.me/${cleanWhatsappNumber}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-md bg-[#1550A5] px-3.5 py-2 text-xs font-medium text-white transition-colors hover:bg-[#124288] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5]"
+                >
+                  <MessageSquare className="size-3.5" />
+                  <span>Chat on WhatsApp</span>
+                </a>
+              </div>
+            )}
           </div>
 
           {/* Column 2: Solutions & Services */}
@@ -159,44 +171,50 @@ export default function Footer() {
               Contact & Location
             </h3>
             <ul className="space-y-3 text-xs">
-              <li className="flex items-start gap-2.5">
-                <MapPin className="size-4 shrink-0 text-neutral-500 mt-0.5" />
-                <span className="leading-relaxed">
-                  {formattedAddress}
-                </span>
-              </li>
+              {formattedAddress && (
+                <li className="flex items-start gap-2.5">
+                  <MapPin className="size-4 shrink-0 text-neutral-500 mt-0.5" />
+                  <span className="leading-relaxed">
+                    {formattedAddress}
+                  </span>
+                </li>
+              )}
 
-              <li className="flex items-start gap-2.5">
-                <Phone className="size-4 shrink-0 text-neutral-500 mt-0.5" />
-                <div className="flex flex-col space-y-1">
-                  {phoneNumbers.map((phone) => (
-                    <a
-                      key={phone}
-                      href={`tel:+${phone.replace(/\D/g, "")}`}
-                      className="transition-colors hover:text-[#1550A5] dark:hover:text-blue-400 font-mono"
-                    >
-                      {formatPhoneNumber(phone)}
-                    </a>
-                  ))}
-                </div>
-              </li>
+              {phoneNumbers.length > 0 && (
+                <li className="flex items-start gap-2.5">
+                  <Phone className="size-4 shrink-0 text-neutral-500 mt-0.5" />
+                  <div className="flex flex-col space-y-1">
+                    {phoneNumbers.map((phone) => (
+                      <a
+                        key={phone}
+                        href={`tel:+${phone.replace(/\D/g, "")}`}
+                        className="transition-colors hover:text-[#1550A5] dark:hover:text-blue-400 font-mono"
+                      >
+                        {formatPhoneNumber(phone)}
+                      </a>
+                    ))}
+                  </div>
+                </li>
+              )}
 
-              <li className="flex items-center gap-2.5">
-                <Mail className="size-4 shrink-0 text-neutral-500" />
-                <a
-                  href={`mailto:${email}`}
-                  className="transition-colors hover:text-[#1550A5] dark:hover:text-blue-400 font-mono"
-                >
-                  {email}
-                </a>
-              </li>
+              {email && (
+                <li className="flex items-center gap-2.5">
+                  <Mail className="size-4 shrink-0 text-neutral-500" />
+                  <a
+                    href={`mailto:${email}`}
+                    className="transition-colors hover:text-[#1550A5] dark:hover:text-blue-400 font-mono"
+                  >
+                    {email}
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
         </div>
 
         {/* Bottom Bar: Copyright & Clean Links */}
         <div className="mt-12 pt-6 border-t border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500 dark:text-neutral-400">
-          <p>© {currentYear} {companyName}. All rights reserved.</p>
+          <p>© {currentYear} {displayName}. All rights reserved.</p>
 
           <div className="flex items-center gap-6">
             <Link
