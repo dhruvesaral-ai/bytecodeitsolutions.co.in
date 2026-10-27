@@ -6,6 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Sun, Moon, Menu, X } from "lucide-react";
 import { useTheme } from "@/context/theme-context";
+import { useSettings } from "@/context/setting-context";
 import LoginModal from "@/components/login";
 import type { PageData } from "@/services/PageService";
 
@@ -64,6 +65,7 @@ interface HeaderProps {
 export default function Header({ initialPages }: HeaderProps = {}) {
   const pathname = usePathname();
   const { resolvedTheme, toggleTheme } = useTheme();
+  const { companyName } = useSettings();
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
@@ -119,11 +121,11 @@ export default function Header({ initialPages }: HeaderProps = {}) {
           <Link
             href="/"
             className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] rounded-md"
-            aria-label="Bytecode IT Solutions Home"
+            aria-label={`${companyName} Home`}
           >
             <Image
               src="/bytecode-light-theme-logo.png"
-              alt="Bytecode IT Solutions"
+              alt={companyName}
               width={200}
               height={67}
               priority
@@ -131,7 +133,7 @@ export default function Header({ initialPages }: HeaderProps = {}) {
             />
             <Image
               src="/bytecode-dark-theme-logo.png"
-              alt="Bytecode IT Solutions"
+              alt={companyName}
               width={200}
               height={67}
               priority
@@ -257,14 +259,14 @@ export default function Header({ initialPages }: HeaderProps = {}) {
           <div className="flex items-center">
             <Image
               src="/bytecode-light-theme-logo.png"
-              alt="Bytecode IT Solutions"
+              alt={companyName}
               width={160}
               height={53}
               className="h-8 w-auto object-contain dark:hidden"
             />
             <Image
               src="/bytecode-dark-theme-logo.png"
-              alt="Bytecode IT Solutions"
+              alt={companyName}
               width={160}
               height={53}
               className="hidden h-8 w-auto object-contain dark:block"

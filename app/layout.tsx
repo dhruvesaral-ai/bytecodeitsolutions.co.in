@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Poppins } from "next/font/google";
 import { ThemeProvider } from "@/context/theme-context";
+import { SettingsProvider } from "@/context/setting-context";
 import SmoothScroll from "@/components/smooth-scroll";
 import Header from "@/components/header";
 import { pageService } from "@/services/PageService";
@@ -113,20 +114,22 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white">
         <ThemeProvider>
-          <Suspense
-            fallback={
-              <div
-                className="h-16 w-full border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black"
-                aria-busy="true"
-              />
-            }
-          >
-            <HeaderSlot />
-          </Suspense>
-          <SmoothScroll>{children}</SmoothScroll>
-          <Suspense fallback={null}>
-            <Footer />
-          </Suspense>
+          <SettingsProvider>
+            <Suspense
+              fallback={
+                <div
+                  className="h-16 w-full border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black"
+                  aria-busy="true"
+                />
+              }
+            >
+              <HeaderSlot />
+            </Suspense>
+            <SmoothScroll>{children}</SmoothScroll>
+            <Suspense fallback={null}>
+              <Footer />
+            </Suspense>
+          </SettingsProvider>
         </ThemeProvider>
       </body>
     </html>
