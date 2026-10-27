@@ -3,6 +3,7 @@ import PlacedStudents from "@/components/placed-students";
 import HomeContent from "@/components/home-content";
 import EnquireNow from "@/components/enquire-now";
 import { pageService } from "@/services/PageService";
+import { formatHeadingHtml } from "@/lib/format-heading";
 
 async function HomeHero() {
   const page = await pageService.getPageByRoute("home");
@@ -17,7 +18,7 @@ async function HomeHero() {
         page.heading.includes("<") ? (
           <h1
             className="text-left sm:text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 dark:text-white"
-            dangerouslySetInnerHTML={{ __html: page.heading }}
+            dangerouslySetInnerHTML={{ __html: formatHeadingHtml(page.heading) }}
           />
         ) : (
           <h1 className="text-left sm:text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 dark:text-white">

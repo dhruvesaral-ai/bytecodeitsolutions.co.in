@@ -1,3 +1,5 @@
+import { formatHeadingHtml } from "@/lib/format-heading";
+
 interface DevelopmentProps {
   heading: string;
   subheading: string;
@@ -9,7 +11,7 @@ export default function Development({ heading, subheading }: DevelopmentProps) {
       {heading.includes("<") ? (
         <h1
           className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-4xl"
-          dangerouslySetInnerHTML={{ __html: heading }}
+          dangerouslySetInnerHTML={{ __html: formatHeadingHtml(heading) }}
         />
       ) : (
         <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-4xl">

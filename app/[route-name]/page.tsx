@@ -4,6 +4,7 @@ import { pageService } from "@/services/PageService";
 import EnquireNow from "@/components/enquire-now";
 import Development from "@/components/pages/development";
 import Training from "@/components/pages/training";
+import { formatHeadingHtml } from "@/lib/format-heading";
 
 interface PageProps {
   params: Promise<{ "route-name": string }>;
@@ -28,7 +29,7 @@ async function DynamicPageContent({ props }: { props: PageProps }) {
           {page.heading.includes("<") ? (
             <h1
               className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-4xl"
-              dangerouslySetInnerHTML={{ __html: page.heading }}
+              dangerouslySetInnerHTML={{ __html: formatHeadingHtml(page.heading) }}
             />
           ) : (
             <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-4xl">

@@ -1,4 +1,5 @@
 import { ApiRequestError, get } from "@/lib/api-method";
+import { formatHeadingHtml } from "@/lib/format-heading";
 
 export interface PageData {
   id: string;
@@ -21,12 +22,19 @@ function isPageData(value: unknown): value is PageData {
   );
 }
 
+function normalizePage(page: PageData): PageData {
+  return {
+    ...page,
+    heading: formatHeadingHtml(page.heading),
+  };
+}
+
 export default class PageService {
   async getPages(): Promise<PageData[]> {
     try {
       const response = await get<{ data?: unknown[] }>("pages");
       if (response && isRecord(response) && Array.isArray(response.data)) {
-        return response.data.filter(isPageData);
+        return response.data.filter(isPageData).map(normalizePage);
       }
     } catch {
       // Backend is unavailable or prerendering
@@ -45,7 +53,7 @@ export default class PageService {
         "data" in response &&
         isPageData(response.data)
       ) {
-        return response.data;
+        return normalizePage(response.data);
       }
     } catch {
       // Backend is unavailable or route not found

@@ -7,6 +7,7 @@ import EnquireNow from "@/components/enquire-now";
 import CoursesExplorer from "@/components/courses-explorer";
 import { courseService } from "@/services/CourseService";
 import { pageService } from "@/services/PageService";
+import { formatHeadingHtml } from "@/lib/format-heading";
 import settings from "@/setting.json";
 
 export const metadata: Metadata = {
@@ -84,7 +85,7 @@ async function CoursesHero() {
           pageData.heading.includes("<") ? (
             <h1
               className="text-3xl sm:text-4xl md:text-5xl text-neutral-900 dark:text-white max-w-4xl"
-              dangerouslySetInnerHTML={{ __html: pageData.heading }}
+              dangerouslySetInnerHTML={{ __html: formatHeadingHtml(pageData.heading) }}
             />
           ) : (
             <h1 className="text-3xl sm:text-4xl md:text-5xl text-neutral-900 dark:text-white max-w-4xl">
