@@ -135,16 +135,6 @@ export default function PlacementGuaranteedSection({
         </div>
 
         {/* Stacking Cards Container */}
-        {/*
-          Each card wrapper is sticky.
-          Offset calculation: top: calc(80px + ${index * 24}px)
-          Header is sticky at 64px (h-16, z-40).
-          Cards have z-index: 10 + index so:
-          1. Header always stays on top of cards (40 > 10..15).
-          2. Card 1 (z-11) slides smoothly OVER Card 0 (z-10).
-          3. Card 2 (z-12) slides smoothly OVER Card 1 (z-11).
-          4. Stepped top offsets (80px, 104px, 128px...) ensure the top of previously stacked cards peek out like a real card deck!
-        */}
         <div className="relative w-full mx-auto space-y-12 sm:space-y-16 pb-24 sm:pb-36">
           {courses.map((course, index) => {
             const theme = CARD_THEMES[index % CARD_THEMES.length];
@@ -174,15 +164,15 @@ export default function PlacementGuaranteedSection({
                   className={`relative rounded-3xl overflow-hidden p-6 sm:p-8 lg:p-10 transition-transform duration-200 ${theme.containerClass}`}
                 >
                   <div
-                    className={`grid grid-cols-1 lg:grid-cols-12 gap-8 items-center ${isReversed ? "lg:[&>*:first-child]:order-2" : ""
+                    className={`grid grid-cols-1 lg:grid-cols-12 gap-8 ${isReversed ? "lg:[&>*:first-child]:order-2" : ""
                       }`}
                   >
                     {/* Media Column (Image & Live Badge) */}
                     <div className="lg:col-span-4 xl:col-span-4 w-full flex justify-center">
                       <div
                         className={`relative w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-xl bg-neutral-900 group ${portraitImgUrl
-                            ? "max-w-[280px] sm:max-w-[320px] lg:aspect-[9/16] lg:max-w-[340px] xl:max-w-[360px]"
-                            : "max-w-[280px] sm:max-w-[320px] lg:max-w-[420px] xl:max-w-[460px]"
+                            ? "lg:aspect-[9/16]"
+                            : ""
                           }`}
                       >
                         {/* Landscape course image (mobile, and desktop when no portrait asset exists) */}
@@ -190,8 +180,7 @@ export default function PlacementGuaranteedSection({
                           src={course.courseImgUrl}
                           alt={course.name}
                           fill
-                          sizes={portraitImgUrl ? "(max-width: 640px) 280px, 320px" : "(max-width: 640px) 280px, (max-width: 1024px) 320px, 420px"}
-                          className={`object-cover transition-transform duration-500 group-hover:scale-105 ${portraitImgUrl ? "lg:hidden" : ""
+                          className={`w-full object-cover transition-transform duration-500 group-hover:scale-105 ${portraitImgUrl ? "lg:hidden" : ""
                             }`}
                           unoptimized
                         />
@@ -210,7 +199,7 @@ export default function PlacementGuaranteedSection({
                     </div>
 
                     {/* Content Column */}
-                    <div className="lg:col-span-8 xl:col-span-8 flex flex-col justify-between space-y-5">
+                    <div className="lg:col-span-8 xl:col-span-8 flex flex-col space-y-5">
 
                       {/* Title */}
                       <h3

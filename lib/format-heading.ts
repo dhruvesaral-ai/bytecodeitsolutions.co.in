@@ -1,13 +1,4 @@
-/**
- * Utility to format and normalize HTML headings received from the backend/CMS.
- *
- * Supports:
- * - Shorthand color syntax: <span style="orange"> or <span style="blue">
- * - Tag attributes: <span color="orange"> or <span class="orange">
- * - Maps 'orange' and 'blue' to the brand theme colors (#F58216 and #1550A5)
- * - Auto-corrects malformed/mistyped closing tags like <span style="...">text<span> -> </span>
- * - Balances and closes unclosed tags
- */
+
 export function formatHeadingHtml(html: string): string {
   if (!html || typeof html !== "string") return "";
 
