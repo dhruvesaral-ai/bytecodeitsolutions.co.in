@@ -19,6 +19,7 @@ export interface Course {
   duration: string;
   status: string;
   courseImgUrl: string;
+  portraitImgUrl: string;
   courseCategorieId: string;
   isInSale: boolean;
   syllabus: string | null;
@@ -54,6 +55,7 @@ function parseCourse(value: unknown, index: number): Course {
     typeof value.name !== "string" ||
     typeof value.courseCategorieId !== "string" ||
     typeof value.status !== "string" ||
+    typeof value.portraitImgUrl !== "string" ||
     typeof value.courseImgUrl !== "string"
   ) {
     throw new Error(`Courses API returned an invalid course at item ${index}.`);
@@ -85,6 +87,7 @@ function parseCourse(value: unknown, index: number): Course {
     technologyTags,
     duration: typeof value.duration === "string" ? value.duration : "",
     status: value.status,
+    portraitImgUrl: resolveMediaUrl(value.portraitImgUrl),
     courseImgUrl: resolveMediaUrl(value.courseImgUrl),
     courseCategorieId: value.courseCategorieId,
     isInSale: value.isInSale === true,

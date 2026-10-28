@@ -176,13 +176,22 @@ export default function PlacementGuaranteedSection({
                     {/* Media Column (Image & Live Badge) */}
                     <div className="lg:col-span-4 xl:col-span-4 w-full flex justify-center">
                       <div className="relative aspect-[9/16] w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[340px] xl:max-w-[360px] rounded-2xl overflow-hidden shadow-xl bg-neutral-900 group">
+                        {/* Small screens: landscape course image */}
                         <Image
                           src={course.courseImgUrl}
                           alt={course.name}
                           fill
-                          sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 360px"
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                          priority={index === 0}
+                          sizes="(max-width: 640px) 280px, 320px"
+                          className="object-cover transition-transform duration-500 group-hover:scale-105 lg:hidden"
+                          unoptimized
+                        />
+                        {/* Large screens: portrait course image */}
+                        <Image
+                          src={course.portraitImgUrl || course.courseImgUrl}
+                          alt={course.name}
+                          fill
+                          sizes="(max-width: 1280px) 340px, 360px"
+                          className="hidden object-cover transition-transform duration-500 group-hover:scale-105 lg:block"
                           unoptimized
                         />
                       </div>
