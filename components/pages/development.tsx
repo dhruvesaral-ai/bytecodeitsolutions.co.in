@@ -1,11 +1,18 @@
 import { formatHeadingHtml } from "@/lib/format-heading";
+import ProjectsShowcase from "@/components/projects-showcase";
+import type { Project } from "@/services/ProjectService";
 
 interface DevelopmentProps {
   heading: string;
   subheading: string;
+  projects: Project[];
 }
 
-export default function Development({ heading, subheading }: DevelopmentProps) {
+export default function Development({
+  heading,
+  subheading,
+  projects,
+}: DevelopmentProps) {
   return (
     <section>
       {heading.includes("<") ? (
@@ -21,6 +28,8 @@ export default function Development({ heading, subheading }: DevelopmentProps) {
       <p className="mt-4 max-w-3xl text-base leading-relaxed text-neutral-600 dark:text-neutral-400 sm:text-lg">
         {subheading}
       </p>
+
+      <ProjectsShowcase projects={projects} />
     </section>
   );
 }

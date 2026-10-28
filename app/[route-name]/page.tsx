@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { pageService } from "@/services/PageService";
+import { projectService } from "@/services/ProjectService";
 import EnquireNow from "@/components/enquire-now";
 import Development from "@/components/pages/development";
 import Training from "@/components/pages/training";
@@ -18,10 +19,20 @@ async function DynamicPageContent({ props }: { props: PageProps }) {
     notFound();
   }
 
+  // Only the development page showcases the project portfolio
+  const projects =
+    routeName.toLowerCase() === "development"
+      ? await projectService.getProjects()
+      : [];
+
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <main className="px-4 sm:px-6 lg:px-8 py-16">
       {routeName.toLowerCase() === "development" ? (
-        <Development heading={page.heading} subheading={page.subheading} />
+        <Development
+          heading={page.heading}
+          subheading={page.subheading}
+          projects={projects}
+        />
       ) : routeName.toLowerCase() === "training" || routeName.toLowerCase() === "trainings" ? (
         <Training heading={page.heading} subheading={page.subheading} />
       ) : (
