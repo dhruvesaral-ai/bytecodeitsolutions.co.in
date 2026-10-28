@@ -28,7 +28,7 @@ export default function ProjectsShowcase({ projects }: ProjectsShowcaseProps) {
           return (
             <li
               key={project.id}
-              className="grid items-center gap-6 sm:gap-8 lg:grid-cols-2 lg:gap-12"
+              className="grid gap-6 sm:gap-8 lg:grid-cols-2 lg:gap-12"
             >
               <div
                 className={`relative aspect-video w-full overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-900 ${

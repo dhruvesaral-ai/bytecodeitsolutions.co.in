@@ -60,7 +60,14 @@ export default class ProjectService {
       const response = await get<unknown>("projects");
 
       if (isRecord(response) && Array.isArray(response.data)) {
-        return response.data.map(parseProject);
+        const projects = response.data.map(parseProject);
+        projects.sort((a, b) => {
+          const at = Date.parse(a.createdAt || a.updatedAt) || 0;
+          const bt = Date.parse(b.createdAt || b.updatedAt) || 0;
+          if (at !== bt) return at - bt;
+          return a.id.localeCompare(b.id);
+        });
+        return projects;
       }
     } catch (error) {
       console.error("Failed to load projects:", error);

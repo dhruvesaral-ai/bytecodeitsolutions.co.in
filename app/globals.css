@@ -38,22 +38,29 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * Theme tokens are driven exclusively by the `.dark` class on <html>,
+ * applied by ThemeProvider (context/theme-context.tsx) and the
+ * pre-hydration script in app/layout.tsx. We intentionally do NOT use a
+ * `@media (prefers-color-scheme: dark)` override here, because that would
+ * force dark surfaces even when the user explicitly picks Light theme.
+ */
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --background: #000000;
+  --foreground: #FFFFFF;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/*
+ * Base body styling lives in `@layer base` so Tailwind utilities like
+ * `bg-white dark:bg-black` on <body> (see app/layout.tsx) still win the
+ * cascade. Never move this rule out of a layer.
+ */
+@layer base {
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-neue-machina), var(--font-poppins), sans-serif;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-neue-machina), var(--font-poppins), sans-serif;
 }
 
 /* Swiper Custom Pagination */

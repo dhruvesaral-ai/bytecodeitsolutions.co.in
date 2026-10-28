@@ -104,7 +104,7 @@ export default function PlacementGuaranteedSection({
     <section
       id="placement-guaranteed-courses"
       aria-labelledby="placement-section-heading"
-      className="relative w-full py-16 sm:py-24 border-y transition-colors duration-300 bg-[#0C0D14] text-white border-neutral-800/80 dark:bg-[#FAF4EE] dark:text-neutral-900 dark:border-amber-900/10 rounded-tl-[50px] rounded-tr-[50px] overflow-visible"
+      className="relative w-full py-16 sm:py-24 border-y transition-colors duration-300 bg-[#FAF4EE] text-neutral-900 border-amber-900/10 dark:bg-[#0C0D14] dark:text-white dark:border-neutral-800/80 rounded-tl-[50px] rounded-tr-[50px] overflow-visible"
     >
       <div className="relative mx-auto w-[90%] px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
@@ -112,13 +112,13 @@ export default function PlacementGuaranteedSection({
 
           <h2
             id="placement-section-heading"
-            className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl text-white dark:text-neutral-900"
+            className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl text-neutral-900 dark:text-white"
           >
             Wanted to get a <strong>Job</strong>?<br></br>
             <span className="block">We&apos;re Here To Help.</span>
           </h2>
 
-          <p className="mt-4 text-sm sm:text-base text-neutral-300 dark:text-neutral-600 leading-relaxed max-w-2xl mx-auto">
+          <p className="mt-4 text-sm sm:text-base text-neutral-700 dark:text-neutral-300 leading-relaxed max-w-2xl mx-auto">
             Explore industry-vetted cohorts backed by 100% placement assurance,
             dedicated 1-on-1 mentorship, and production-grade capstone projects.
           </p>
