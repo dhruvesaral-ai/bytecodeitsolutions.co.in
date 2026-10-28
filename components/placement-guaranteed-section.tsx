@@ -157,6 +157,10 @@ export default function PlacementGuaranteedSection({
                 : `${course.duration} Months`
               : "";
 
+            // Portrait art is optional; when absent the landscape asset is used
+            // on every breakpoint and the frame must stay landscape too.
+            const portraitImgUrl = course.portraitImgUrl;
+
             return (
               <div
                 key={course.id}
@@ -175,25 +179,33 @@ export default function PlacementGuaranteedSection({
                   >
                     {/* Media Column (Image & Live Badge) */}
                     <div className="lg:col-span-4 xl:col-span-4 w-full flex justify-center">
-                      <div className="relative aspect-[9/16] w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[340px] xl:max-w-[360px] rounded-2xl overflow-hidden shadow-xl bg-neutral-900 group">
-                        {/* Small screens: landscape course image */}
+                      <div
+                        className={`relative w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-xl bg-neutral-900 group ${portraitImgUrl
+                            ? "max-w-[280px] sm:max-w-[320px] lg:aspect-[9/16] lg:max-w-[340px] xl:max-w-[360px]"
+                            : "max-w-[280px] sm:max-w-[320px] lg:max-w-[420px] xl:max-w-[460px]"
+                          }`}
+                      >
+                        {/* Landscape course image (mobile, and desktop when no portrait asset exists) */}
                         <Image
                           src={course.courseImgUrl}
                           alt={course.name}
                           fill
-                          sizes="(max-width: 640px) 280px, 320px"
-                          className="object-cover transition-transform duration-500 group-hover:scale-105 lg:hidden"
+                          sizes={portraitImgUrl ? "(max-width: 640px) 280px, 320px" : "(max-width: 640px) 280px, (max-width: 1024px) 320px, 420px"}
+                          className={`object-cover transition-transform duration-500 group-hover:scale-105 ${portraitImgUrl ? "lg:hidden" : ""
+                            }`}
                           unoptimized
                         />
                         {/* Large screens: portrait course image */}
-                        <Image
-                          src={course.portraitImgUrl || course.courseImgUrl}
-                          alt={course.name}
-                          fill
-                          sizes="(max-width: 1280px) 340px, 360px"
-                          className="hidden object-cover transition-transform duration-500 group-hover:scale-105 lg:block"
-                          unoptimized
-                        />
+                        {portraitImgUrl && (
+                          <Image
+                            src={portraitImgUrl}
+                            alt={course.name}
+                            fill
+                            sizes="(max-width: 1280px) 340px, 360px"
+                            className="hidden object-cover transition-transform duration-500 group-hover:scale-105 lg:block"
+                            unoptimized
+                          />
+                        )}
                       </div>
                     </div>
 
