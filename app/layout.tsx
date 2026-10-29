@@ -117,7 +117,9 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white">
-        <ScrollToTop />
+        <Suspense fallback={null}>
+          <ScrollToTop />
+        </Suspense>
         <ThemeProvider>
           <SettingsProvider initialSettings={settings}>
             <AnimatedBanner />
