@@ -45,7 +45,7 @@ function EnquireNowFab({ mode }: EnquireNowProps) {
         onClick={handleToggle}
         aria-label="Enquire now"
         aria-expanded={isOpen}
-        className="fixed bottom-6 right-6 z-50 flex size-14 animate-bounce items-center justify-center rounded-full bg-[#F97316] text-white shadow-lg transition-colors hover:bg-[#EA580C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F97316] focus-visible:ring-offset-2 cursor-pointer"
+        className="fixed bottom-6 right-6 z-50 flex size-14 animate-bounce items-center justify-center rounded-full bg-[#F58216] text-white shadow-lg transition-colors hover:bg-[#DE5426] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F58216] focus-visible:ring-offset-2 cursor-pointer"
       >
         <MessageCircle className="size-7" aria-hidden="true" />
       </button>

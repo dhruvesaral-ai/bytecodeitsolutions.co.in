@@ -236,7 +236,7 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                   htmlFor="enquiry-first-name"
                   className="block text-xs font-medium text-blue-50"
                 >
-                  First Name <span className="text-orange-400">*</span>
+                  First Name <span className="text-[#F58216]">*</span>
                 </label>
                 <input
                   id="enquiry-first-name"
@@ -245,7 +245,7 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                   onChange={(e) => form.setFirstName(e.target.value)}
                   placeholder="Aarav"
                   autoFocus
-                  className="h-10 w-full rounded-md border border-white/30 bg-white px-3 text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
+                  className="h-10 w-full rounded-md border border-white/30 bg-white px-3 text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-[#F58216] focus:outline-none focus:ring-1 focus:ring-[#F58216]"
                 />
               </div>
               <div className="space-y-1.5">
@@ -253,7 +253,7 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                   htmlFor="enquiry-last-name"
                   className="block text-xs font-medium text-blue-50"
                 >
-                  Last Name <span className="text-orange-400">*</span>
+                  Last Name <span className="text-[#F58216]">*</span>
                 </label>
                 <input
                   id="enquiry-last-name"
@@ -261,7 +261,7 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                   value={form.lastName}
                   onChange={(e) => form.setLastName(e.target.value)}
                   placeholder="Sharma"
-                  className="h-10 w-full rounded-md border border-white/30 bg-white px-3 text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
+                  className="h-10 w-full rounded-md border border-white/30 bg-white px-3 text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-[#F58216] focus:outline-none focus:ring-1 focus:ring-[#F58216]"
                 />
               </div>
             </div>
@@ -272,9 +272,9 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                 htmlFor="enquiry-phone"
                 className="block text-xs font-medium text-blue-50"
               >
-                Mobile Number <span className="text-orange-400">*</span>
+                Mobile Number <span className="text-[#F58216]">*</span>
               </label>
-              <div className="flex h-10 w-full rounded-md border border-white/30 bg-white focus-within:border-orange-400 focus-within:ring-1 focus-within:ring-orange-400">
+              <div className="flex h-10 w-full rounded-md border border-white/30 bg-white focus-within:border-[#F58216] focus-within:ring-1 focus-within:ring-[#F58216]">
                 <span className="flex items-center justify-center border-r border-neutral-300 bg-neutral-100 px-3 text-xs font-semibold text-neutral-500 select-none">
                   +91
                 </span>
@@ -291,7 +291,7 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                 />
               </div>
               {form.phone.length > 0 && form.phone.length < 10 && (
-                <p className="text-[11px] text-orange-200">
+                <p className="text-[11px] text-amber-200">
                   Please enter a valid 10-digit mobile number.
                 </p>
               )}
@@ -304,14 +304,14 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                   htmlFor="enquiry-course"
                   className="block text-xs font-medium text-blue-50"
                 >
-                  Interested Course <span className="text-orange-400">*</span>
+                  Interested Course <span className="text-[#F58216]">*</span>
                 </label>
                 <select
                   id="enquiry-course"
                   value={form.courseId}
                   onChange={(e) => form.setCourseId(e.target.value)}
                   disabled={form.coursesLoading}
-                  className="h-10 w-full rounded-md border border-white/30 bg-white px-3 text-sm font-medium text-neutral-900 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400 disabled:opacity-50"
+                  className="h-10 w-full rounded-md border border-white/30 bg-white px-3 text-sm font-medium text-neutral-900 focus:border-[#F58216] focus:outline-none focus:ring-1 focus:ring-[#F58216] disabled:opacity-50"
                 >
                   <option value="">
                     {form.coursesLoading ? "Loading courses..." : "Select a course"}
@@ -340,7 +340,7 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                   value={form.message}
                   onChange={(e) => form.setMessage(e.target.value)}
                   placeholder="Tell us about your project or requirement..."
-                  className="w-full resize-none rounded-md border border-white/30 bg-white px-3 py-2 text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
+                  className="w-full resize-none rounded-md border border-white/30 bg-white px-3 py-2 text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-[#F58216] focus:outline-none focus:ring-1 focus:ring-[#F58216]"
                 />
               </div>
             )}

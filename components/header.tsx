@@ -162,6 +162,7 @@ export default function Header({ initialPages }: HeaderProps = {}) {
               <Link
                 key={item.href}
                 href={item.href}
+                scroll={true}
                 className={`text-sm transition-colors py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] rounded ${
                   isActive
                     ? "font-semibold text-[#1550A5] dark:text-blue-400 border-b-2 border-[#1550A5] dark:border-blue-400"
@@ -202,7 +203,7 @@ export default function Header({ initialPages }: HeaderProps = {}) {
           <button
             type="button"
             onClick={() => setLoginModalOpen(true)}
-            className="hidden md:block rounded-md bg-orange-400 px-4 py-2 text-sm font-medium text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] focus-visible:ring-offset-2 active:bg-[#0e336b] cursor-pointer"
+            className="hidden md:block rounded-md bg-[#F58216] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#DE5426] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F58216] focus-visible:ring-offset-2 active:bg-[#c7451a] cursor-pointer"
           >
             Enquire Now
           </button>

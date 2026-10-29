@@ -42,10 +42,10 @@ const CARD_THEMES: CardTheme[] = [
     badgeClass:
       "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60",
   },
-  // 1: Vibrant Terracotta / Brand Orange Card (Image 2)
+  // 1: Brand Orange Card
   {
     containerClass:
-      "bg-[#E85D04] text-white border-0 ring-1 ring-white/20 shadow-[0_-12px_40px_rgba(232,93,4,0.35)]",
+      "bg-[#F58216] text-white border-0 ring-1 ring-white/20 shadow-[0_-12px_40px_rgba(245,130,22,0.35)]",
     titleColor: "text-white",
     descriptionColor: "text-white/90",
     pillClass:
@@ -53,7 +53,7 @@ const CARD_THEMES: CardTheme[] = [
     priceClass: "text-white",
     strikethroughClass: "text-white/70",
     buttonClass:
-      "bg-white hover:bg-neutral-100 text-[#E85D04] font-bold shadow-lg hover:shadow-xl focus-visible:ring-white",
+      "bg-white hover:bg-neutral-100 text-[#F58216] font-bold shadow-lg hover:shadow-xl focus-visible:ring-white",
     badgeClass: "bg-white/20 text-white border-white/30 backdrop-blur-xs",
   },
   // 2: Obsidian Pitch Black Card (Image 2)
@@ -126,7 +126,7 @@ export default function PlacementGuaranteedSection({
           <div className="mt-6 flex justify-center">
             <Link
               href="/courses"
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#DE5426] hover:bg-[#c7451a] text-white font-medium text-sm transition-all shadow-md hover:shadow-lg hover:scale-105 active:scale-95"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#F58216] hover:bg-[#DE5426] text-white font-medium text-sm transition-all shadow-md hover:shadow-lg hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F58216]"
             >
               <span>Explore Courses</span>
               <ArrowRight className="size-4" />

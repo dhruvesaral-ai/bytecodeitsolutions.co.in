@@ -11,7 +11,7 @@ import { getCachedSettings } from "@/lib/cached-settings";
 import "./globals.css";
 import Footer from "@/components/footer";
 import AnimatedBanner from "@/components/animated-banner";
-
+import ScrollToTop from "@/components/scroll-to-top";
 async function HeaderSlot() {
   const pages = await pageService.getPages();
   console.log("Pages :",pages);
@@ -117,6 +117,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white">
+        <ScrollToTop />
         <ThemeProvider>
           <SettingsProvider initialSettings={settings}>
             <AnimatedBanner />
