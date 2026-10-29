@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { Suspense, useCallback, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Loader2, MessageCircle, Phone } from "lucide-react";
 import { useSettings } from "@/context/setting-context";
@@ -15,6 +15,16 @@ interface EnquireNowProps {
 }
 
 export default function EnquireNow({ mode }: EnquireNowProps) {
+  // usePathname() is runtime-only, so the bar must stream in behind Suspense
+  // to avoid blocking prerendering of the routes that render it.
+  return (
+    <Suspense fallback={null}>
+      <EnquireNowBar mode={mode} />
+    </Suspense>
+  );
+}
+
+function EnquireNowBar({ mode }: EnquireNowProps) {
   const { cleanWhatsappNumber, phoneNumbers } = useSettings();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
