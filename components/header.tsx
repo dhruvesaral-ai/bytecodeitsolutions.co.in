@@ -201,6 +201,14 @@ export default function Header({ initialPages }: HeaderProps = {}) {
             )}
           </button>
 
+          <button
+            type="button"
+            onClick={() => setLoginModalOpen(true)}
+            className="hidden md:block rounded-md bg-orange-400 px-4 py-2 text-sm font-medium text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] focus-visible:ring-offset-2 active:bg-[#0e336b] cursor-pointer"
+          >
+            Enquire Now
+          </button>
+
           {/* Login Button */}
           <button
             type="button"

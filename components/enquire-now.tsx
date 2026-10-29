@@ -1,19 +1,43 @@
 "use client";
 
-import { MessageCircle, Phone } from "lucide-react";
+import { useCallback, useState } from "react";
+import { Loader2, MessageCircle, Phone } from "lucide-react";
 import { useSettings } from "@/context/setting-context";
+import EnquiryModal, { useEnquiryForm } from "@/components/enquiry-modal";
 
 export default function EnquireNow() {
   const { cleanWhatsappNumber, phoneNumbers } = useSettings();
+  const [isOpen, setIsOpen] = useState(false);
+  const closeEnquiry = useCallback(() => setIsOpen(false), []);
+  const form = useEnquiryForm(isOpen, closeEnquiry);
   const primaryPhone = phoneNumbers[0] ? phoneNumbers[0].replace(/\D/g, "") : "";
+
+  // Closed: opens the sheet behind this action bar. Open: submits the form.
+  const handleEnquire = () => {
+    if (isOpen) {
+      form.submit();
+      return;
+    }
+    form.reset();
+    setIsOpen(true);
+  };
 
   return (
     <div className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2">
       <button
         type="button"
-        className="whitespace-nowrap rounded-full bg-[#1550A5] px-6 py-3 font-semibold text-white shadow-lg transition-colors hover:bg-[#0f3a7a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] focus-visible:ring-offset-2 cursor-pointer"
+        onClick={handleEnquire}
+        disabled={form.isSubmitting}
+        className="md:hidden flex whitespace-nowrap items-center gap-2 rounded-full bg-[#F97316] px-6 py-3 font-semibold text-white shadow-lg transition-colors hover:bg-[#EA580C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F97316] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70 cursor-pointer"
       >
-        Enquire Now
+        {form.isSubmitting && (
+          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+        )}
+        {form.isSubmitting
+          ? "Submitting..."
+          : isOpen
+            ? "Submit Enquiry"
+            : "Enquire Now"}
       </button>
       <a
         href={cleanWhatsappNumber ? `https://wa.me/${cleanWhatsappNumber}` : "#"}
@@ -36,6 +60,7 @@ export default function EnquireNow() {
       >
         <Phone className="size-5" aria-hidden="true" />
       </a>
+      <EnquiryModal isOpen={isOpen} onClose={closeEnquiry} form={form} />
     </div>
   );
 }

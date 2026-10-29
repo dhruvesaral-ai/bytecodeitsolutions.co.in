@@ -13,15 +13,15 @@ async function HomeHero() {
   }
 
   return (
-    <section className="pt-8 sm:pt-12 pb-4 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-left sm:text-center">
+    <section className="pt-8 sm:pt-12 pb-4 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center">
       {page.heading && (
         page.heading.includes("<") ? (
           <h1
-            className="text-left sm:text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 dark:text-white"
+            className="text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 dark:text-white"
             dangerouslySetInnerHTML={{ __html: formatHeadingHtml(page.heading) }}
           />
         ) : (
-          <h1 className="text-left sm:text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 dark:text-white">
+          <h1 className="text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 dark:text-white">
             {page.heading}
           </h1>
         )
