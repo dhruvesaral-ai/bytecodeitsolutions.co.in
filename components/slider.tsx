@@ -123,7 +123,6 @@ export default function Slider({
                       loading={index === 0 ? "eager" : "lazy"}
                       className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                       sizes="(max-width: 1280px) 100vw, 1280px"
-                      unoptimized
                     />
                   )}
                   {hasContent && <div className="absolute inset-0 bg-black/65" />}

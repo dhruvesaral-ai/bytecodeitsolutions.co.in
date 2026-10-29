@@ -12,7 +12,6 @@ function StudentCard({ student }: { student: StudentTestimonial }) {
           fill
           className="object-cover"
           sizes="48px"
-          unoptimized
         />
       </div>
       <div className="min-w-0 flex-1">
@@ -58,7 +57,6 @@ export default async function PlacedStudents() {
             fill
             className="object-contain"
             sizes="(max-width: 768px) 100vw, 642px"
-            unoptimized
           />
         </div>
       </div>

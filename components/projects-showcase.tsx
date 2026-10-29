@@ -55,7 +55,6 @@ export default function ProjectsShowcase({ projects }: ProjectsShowcaseProps) {
                     fill
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     className="object-cover"
-                    unoptimized
                   />
                 )}
               </div>

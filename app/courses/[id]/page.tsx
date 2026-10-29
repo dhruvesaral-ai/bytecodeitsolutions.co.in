@@ -43,7 +43,6 @@ async function CourseDetails({
               priority
               sizes="(max-width: 1024px) 100vw, 65vw"
               className="object-cover"
-              unoptimized
             />
           </div>
 

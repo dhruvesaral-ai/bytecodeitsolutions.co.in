@@ -138,7 +138,6 @@ export default function Header({ initialPages }: HeaderProps = {}) {
               width={200}
               height={67}
               priority
-              unoptimized={Boolean(companyLightThemedLogoUrl)}
               className="h-9 w-auto object-contain dark:hidden"
             />
             <Image
@@ -147,7 +146,6 @@ export default function Header({ initialPages }: HeaderProps = {}) {
               width={200}
               height={67}
               priority
-              unoptimized={Boolean(companyDarkThemedLogoUrl)}
               className="hidden h-9 w-auto object-contain dark:block"
             />
           </Link>
@@ -281,7 +279,6 @@ export default function Header({ initialPages }: HeaderProps = {}) {
               alt={displayName}
               width={160}
               height={53}
-              unoptimized={Boolean(companyLightThemedLogoUrl)}
               className="h-8 w-auto object-contain dark:hidden"
             />
             <Image
@@ -289,7 +286,6 @@ export default function Header({ initialPages }: HeaderProps = {}) {
               alt={displayName}
               width={160}
               height={53}
-              unoptimized={Boolean(companyDarkThemedLogoUrl)}
               className="hidden h-8 w-auto object-contain dark:block"
             />
           </div>

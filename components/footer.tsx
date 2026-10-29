@@ -41,7 +41,6 @@ export default function Footer() {
                 alt={displayName}
                 width={180}
                 height={60}
-                unoptimized={Boolean(companyLightThemedLogoUrl)}
                 className="h-8 w-auto object-contain dark:hidden"
               />
               <Image
@@ -49,7 +48,6 @@ export default function Footer() {
                 alt={displayName}
                 width={180}
                 height={60}
-                unoptimized={Boolean(companyDarkThemedLogoUrl)}
                 className="hidden h-8 w-auto object-contain dark:block"
               />
             </Link>

@@ -10,6 +10,7 @@ import { pageService } from "@/services/PageService";
 import { getCachedSettings } from "@/lib/cached-settings";
 import "./globals.css";
 import Footer from "@/components/footer";
+import AnimatedBanner from "@/components/animated-banner";
 
 async function HeaderSlot() {
   const pages = await pageService.getPages();
@@ -118,6 +119,7 @@ export default async function RootLayout({
       <body className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white">
         <ThemeProvider>
           <SettingsProvider initialSettings={settings}>
+            <AnimatedBanner />
             <Suspense
               fallback={
                 <div

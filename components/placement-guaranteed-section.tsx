@@ -106,7 +106,7 @@ export default function PlacementGuaranteedSection({
       aria-labelledby="placement-section-heading"
       className="relative w-full py-16 sm:py-24 border-y transition-colors duration-300 bg-[#FAF4EE] text-neutral-900 border-amber-900/10 dark:bg-[#0C0D14] dark:text-white dark:border-neutral-800/80 rounded-tl-[50px] rounded-tr-[50px] overflow-visible"
     >
-      <div className="relative mx-auto w-[90%] px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto w-[95%] px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-7xl mx-auto mb-12 sm:mb-16">
 
@@ -161,7 +161,7 @@ export default function PlacementGuaranteedSection({
                 }}
               >
                 <article
-                  className={`relative rounded-3xl overflow-hidden p-6 sm:p-8 lg:p-10 transition-transform duration-200 ${theme.containerClass}`}
+                  className={`relative rounded-xl overflow-hidden p-4 sm:p-6 lg:p-8 transition-transform duration-200 ${theme.containerClass}`}
                 >
                   <div
                     className={`grid grid-cols-1 lg:grid-cols-12 gap-8 ${isReversed ? "lg:[&>*:first-child]:order-2" : ""
@@ -182,7 +182,6 @@ export default function PlacementGuaranteedSection({
                           fill
                           className={`w-full object-cover transition-transform duration-500 group-hover:scale-105 ${portraitImgUrl ? "lg:hidden" : ""
                             }`}
-                          unoptimized
                         />
                         {/* Large screens: portrait course image */}
                         {portraitImgUrl && (
@@ -192,7 +191,6 @@ export default function PlacementGuaranteedSection({
                             fill
                             sizes="(max-width: 1280px) 340px, 360px"
                             className="hidden object-cover transition-transform duration-500 group-hover:scale-105 lg:block"
-                            unoptimized
                           />
                         )}
                       </div>
@@ -277,7 +275,7 @@ export default function PlacementGuaranteedSection({
 
                       {/* Price & Action Button (Matching Image 2) */}
                       <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-current/10">
-                        <div className="flex items-baseline gap-2">
+                        <div className="hidden  md:flex items-baseline gap-2">
                           <span className="text-xs font-medium uppercase tracking-wider opacity-70">
                             Price
                           </span>
