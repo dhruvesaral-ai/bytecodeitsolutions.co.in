@@ -1,15 +1,28 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Loader2, MessageCircle, Phone } from "lucide-react";
 import { useSettings } from "@/context/setting-context";
-import EnquiryModal, { useEnquiryForm } from "@/components/enquiry-modal";
+import EnquiryModal, {
+  useEnquiryForm,
+  type EnquiryMode,
+} from "@/components/enquiry-modal";
 
-export default function EnquireNow() {
+interface EnquireNowProps {
+  /** Overrides the enquiry mode inferred from the route. */
+  mode?: EnquiryMode;
+}
+
+export default function EnquireNow({ mode }: EnquireNowProps) {
   const { cleanWhatsappNumber, phoneNumbers } = useSettings();
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const closeEnquiry = useCallback(() => setIsOpen(false), []);
-  const form = useEnquiryForm(isOpen, closeEnquiry);
+  // Development pages collect a project brief instead of a course choice.
+  const enquiryMode: EnquiryMode =
+    mode ?? (pathname.startsWith("/development") ? "message" : "course");
+  const form = useEnquiryForm(isOpen, closeEnquiry, enquiryMode);
   const primaryPhone = phoneNumbers[0] ? phoneNumbers[0].replace(/\D/g, "") : "";
 
   // Closed: opens the sheet behind this action bar. Open: submits the form.

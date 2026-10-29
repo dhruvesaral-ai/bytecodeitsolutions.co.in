@@ -8,15 +8,32 @@ import { createWebLead } from "@/services/LeadService";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
+/** "course" targets training pages, "message" targets the development pages. */
+export type EnquiryMode = "course" | "message";
+
+const DEFAULT_UTM_SOURCE = "google_search";
+
+// Prefer the utm_source campaign param the visitor arrived with.
+function resolveUtmSource(): string {
+  if (typeof window === "undefined") return DEFAULT_UTM_SOURCE;
+  const param = new URLSearchParams(window.location.search).get("utm_source");
+  return param?.trim() || DEFAULT_UTM_SOURCE;
+}
+
 /**
  * Owns the enquiry form state outside the sheet, so the floating
  * "Enquire Now" button can double as the submit control.
  */
-export function useEnquiryForm(isOpen: boolean, onClose: () => void) {
+export function useEnquiryForm(
+  isOpen: boolean,
+  onClose: () => void,
+  mode: EnquiryMode = "course"
+) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [courseId, setCourseId] = useState("");
+  const [message, setMessage] = useState("");
   const [courses, setCourses] = useState<Course[] | null>(null);
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -26,11 +43,11 @@ export function useEnquiryForm(isOpen: boolean, onClose: () => void) {
     firstName.trim() !== "" &&
     lastName.trim() !== "" &&
     phone.length === 10 &&
-    courseId !== "";
+    (mode === "course" ? courseId !== "" : true);
 
   // Load the course list the first time the sheet is opened
   useEffect(() => {
-    if (!isOpen || courses !== null) return;
+    if (!isOpen || mode !== "course" || courses !== null) return;
 
     let cancelled = false;
     courseService.getCourses().then((allCourses) => {
@@ -41,13 +58,14 @@ export function useEnquiryForm(isOpen: boolean, onClose: () => void) {
     return () => {
       cancelled = true;
     };
-  }, [isOpen, courses]);
+  }, [isOpen, mode, courses]);
 
   const reset = useCallback(() => {
     setFirstName("");
     setLastName("");
     setPhone("");
     setCourseId("");
+    setMessage("");
     setSubmitState("idle");
     setErrorMessage("");
     setShowRequiredHint(false);
@@ -71,7 +89,10 @@ export function useEnquiryForm(isOpen: boolean, onClose: () => void) {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         username: phone,
-        courseId,
+        utmSource: resolveUtmSource(),
+        // Development enquiries carry no course, course enquiries no message.
+        courseId: mode === "course" ? courseId : null,
+        message: mode === "message" ? message.trim() || null : null,
         status: "hot",
         generatedSource: "online",
       });
@@ -82,9 +103,20 @@ export function useEnquiryForm(isOpen: boolean, onClose: () => void) {
       setErrorMessage("Something went wrong. Please try again.");
       setSubmitState("error");
     }
-  }, [courseId, firstName, isValid, lastName, onClose, phone, submitState]);
+  }, [
+    courseId,
+    firstName,
+    isValid,
+    lastName,
+    message,
+    mode,
+    onClose,
+    phone,
+    submitState,
+  ]);
 
   return {
+    mode,
     firstName,
     setFirstName,
     lastName,
@@ -93,8 +125,10 @@ export function useEnquiryForm(isOpen: boolean, onClose: () => void) {
     handlePhoneChange,
     courseId,
     setCourseId,
+    message,
+    setMessage,
     courses,
-    coursesLoading: courses === null,
+    coursesLoading: mode === "course" && courses === null,
     isValid,
     isSubmitting: submitState === "submitting",
     isSubmitted: submitState === "success",
@@ -142,10 +176,7 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
     e.preventDefault();
     form.submit();
   };
-
-  // z-40 keeps the sheet behind the floating Enquire Now / WhatsApp / call
-  // buttons (z-50), and the portal anchors it to the viewport instead of the
-  // transformed action bar that mounts this component.
+  
   return createPortal(
     <div
       className="fixed inset-0 z-40 flex items-end justify-center bg-[#04142C]/60 animate-backdrop-fade"
@@ -172,7 +203,9 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
               Enquire Now
             </h2>
             <p className="mt-1 text-xs text-blue-100/80 leading-relaxed">
-              Share your details and our team will reach out shortly.
+              {form.mode === "course"
+                ? "Share your details and our team will reach out shortly."
+                : "Tell us about your project and our team will reach out shortly."}
             </p>
           </div>
 
@@ -265,30 +298,52 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
             </div>
 
             {/* Interested Course */}
-            <div className="space-y-1.5">
-              <label
-                htmlFor="enquiry-course"
-                className="block text-xs font-medium text-blue-50"
-              >
-                Interested Course <span className="text-orange-400">*</span>
-              </label>
-              <select
-                id="enquiry-course"
-                value={form.courseId}
-                onChange={(e) => form.setCourseId(e.target.value)}
-                disabled={form.coursesLoading}
-                className="h-10 w-full rounded-md border border-white/30 bg-white px-3 text-sm font-medium text-neutral-900 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400 disabled:opacity-50"
-              >
-                <option value="">
-                  {form.coursesLoading ? "Loading courses..." : "Select a course"}
-                </option>
-                {(form.courses ?? []).map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {course.name}
+            {form.mode === "course" && (
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="enquiry-course"
+                  className="block text-xs font-medium text-blue-50"
+                >
+                  Interested Course <span className="text-orange-400">*</span>
+                </label>
+                <select
+                  id="enquiry-course"
+                  value={form.courseId}
+                  onChange={(e) => form.setCourseId(e.target.value)}
+                  disabled={form.coursesLoading}
+                  className="h-10 w-full rounded-md border border-white/30 bg-white px-3 text-sm font-medium text-neutral-900 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400 disabled:opacity-50"
+                >
+                  <option value="">
+                    {form.coursesLoading ? "Loading courses..." : "Select a course"}
                   </option>
-                ))}
-              </select>
-            </div>
+                  {(form.courses ?? []).map((course) => (
+                    <option key={course.id} value={course.id}>
+                      {course.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Project Requirement Message */}
+            {form.mode === "message" && (
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="enquiry-message"
+                  className="block text-xs font-medium text-blue-50"
+                >
+                  Message
+                </label>
+                <textarea
+                  id="enquiry-message"
+                  rows={4}
+                  value={form.message}
+                  onChange={(e) => form.setMessage(e.target.value)}
+                  placeholder="Tell us about your project or requirement..."
+                  className="w-full resize-none rounded-md border border-white/30 bg-white px-3 py-2 text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
+                />
+              </div>
+            )}
 
             {form.showRequiredHint && (
               <p className="rounded-md bg-black/20 px-3 py-2 text-xs text-white">
