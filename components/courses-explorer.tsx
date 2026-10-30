@@ -10,6 +10,7 @@ import {
   ArrowUpDown,
 } from "lucide-react";
 import CourseCard from "@/components/cards";
+import { useSidebar } from "@/context/sidebar-context";
 import type { Course, CourseCategory } from "@/services/CourseService";
 
 interface CoursesExplorerProps {
@@ -26,7 +27,13 @@ export default function CoursesExplorer({
   const [selectedTag, setSelectedTag] = useState<string>("all");
   const [placementOnly, setPlacementOnly] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<string>("featured");
-  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const {
+    isOpen: sidebarOpen,
+    view: sidebarView,
+    openFilter,
+    closeSidebar,
+    setFilterContent,
+  } = useSidebar();
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
 
   // Extract popular tags across courses
@@ -137,36 +144,165 @@ export default function CoursesExplorer({
   };
 
   useEffect(() => {
-    if (!filterDrawerOpen && !sortMenuOpen) {
+    if (!sortMenuOpen) {
       return;
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setFilterDrawerOpen(false);
         setSortMenuOpen(false);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [filterDrawerOpen, sortMenuOpen]);
-
-  useEffect(() => {
-    if (filterDrawerOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [filterDrawerOpen]);
+  }, [sortMenuOpen]);
 
   const selectedFilterCount =
     Number(selectedCategoryId !== "all") +
     Number(selectedTag !== "all") +
     Number(placementOnly);
+
+  const filterControlsNode = (
+    <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex-1 space-y-6 overflow-y-auto px-5 py-5">
+        <fieldset>
+          <legend className="mb-3 text-sm font-semibold text-neutral-900 dark:text-white">
+            Course category
+          </legend>
+          <div className="flex flex-col gap-1">
+            <button
+              type="button"
+              onClick={() => setSelectedCategoryId("all")}
+              aria-pressed={selectedCategoryId === "all"}
+              className={`flex items-center justify-between rounded-md px-3 py-2 text-left text-sm cursor-pointer ${
+                selectedCategoryId === "all"
+                  ? "bg-blue-50 font-semibold text-[#1550A5] dark:bg-blue-950/40 dark:text-blue-300"
+                  : "text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+              }`}
+            >
+              All Courses
+              <span>{categoryCounts.all || 0}</span>
+            </button>
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                type="button"
+                onClick={() => setSelectedCategoryId(category.id)}
+                aria-pressed={selectedCategoryId === category.id}
+                className={`flex items-center justify-between rounded-md px-3 py-2 text-left text-sm cursor-pointer ${
+                  selectedCategoryId === category.id
+                    ? "bg-blue-50 font-semibold text-[#1550A5] dark:bg-blue-950/40 dark:text-blue-300"
+                    : "text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                }`}
+              >
+                {category.name}
+                <span>{categoryCounts[category.id] || 0}</span>
+              </button>
+            ))}
+          </div>
+        </fieldset>
+
+        {popularTags.length > 0 && (
+          <fieldset>
+            <legend className="mb-3 text-sm font-semibold text-neutral-900 dark:text-white">
+              Technologies
+            </legend>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedTag("all")}
+                aria-pressed={selectedTag === "all"}
+                className={`rounded-md px-3 py-1.5 text-sm cursor-pointer ${
+                  selectedTag === "all"
+                    ? "bg-[#1550A5] font-semibold text-white"
+                    : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                }`}
+              >
+                All Tech
+              </button>
+              {popularTags.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() =>
+                    setSelectedTag((selected) =>
+                      selected.toLowerCase() === tag.toLowerCase()
+                        ? "all"
+                        : tag
+                    )
+                  }
+                  aria-pressed={
+                    selectedTag.toLowerCase() === tag.toLowerCase()
+                  }
+                  className={`rounded-md px-3 py-1.5 text-sm cursor-pointer ${
+                    selectedTag.toLowerCase() === tag.toLowerCase()
+                      ? "bg-[#1550A5] font-semibold text-white"
+                      : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        )}
+
+        <label className="flex cursor-pointer items-center gap-3 rounded-md border border-neutral-200 p-3 text-sm font-medium text-neutral-800 dark:border-neutral-800 dark:text-neutral-200">
+          <input
+            type="checkbox"
+            checked={placementOnly}
+            onChange={(event) => setPlacementOnly(event.target.checked)}
+            className="size-4 accent-[#1550A5]"
+          />
+          Placement Assured
+        </label>
+      </div>
+
+      <div className="flex gap-3 border-t border-neutral-200 p-4 dark:border-neutral-800 shrink-0">
+        <button
+          type="button"
+          onClick={resetFilters}
+          className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-neutral-300 text-sm font-medium text-neutral-800 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800 cursor-pointer"
+        >
+          <RotateCcw className="size-4" />
+          Reset
+        </button>
+        <button
+          type="button"
+          onClick={closeSidebar}
+          className="h-11 flex-1 rounded-lg bg-[#1550A5] text-sm font-semibold text-white hover:bg-[#124288] cursor-pointer"
+        >
+          Show {filteredCourses.length}{" "}
+          {filteredCourses.length === 1 ? "course" : "courses"}
+        </button>
+      </div>
+    </div>
+  );
+
+  // Synchronize filter content to the unified sidebar
+  useEffect(() => {
+    if (sidebarOpen && sidebarView === "filter") {
+      setFilterContent(filterControlsNode);
+    }
+  }, [
+    sidebarOpen,
+    sidebarView,
+    selectedCategoryId,
+    selectedTag,
+    placementOnly,
+    filteredCourses.length,
+    categoryCounts,
+    categories,
+    popularTags,
+    setFilterContent,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      setFilterContent(null);
+    };
+  }, [setFilterContent]);
 
   const sortOptions = [
     { value: "featured", label: "Featured / Recommended" },
@@ -209,10 +345,10 @@ export default function CoursesExplorer({
           <div className="flex w-full items-center gap-3 md:hidden">
             <button
               type="button"
-              onClick={() => setFilterDrawerOpen(true)}
+              onClick={() => openFilter(filterControlsNode, "Filters")}
               aria-haspopup="dialog"
-              aria-expanded={filterDrawerOpen}
-              className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-neutral-300 bg-white text-sm font-medium text-neutral-800 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
+              aria-expanded={sidebarOpen && sidebarView === "filter"}
+              className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-neutral-300 bg-white text-sm font-medium text-neutral-800 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800 cursor-pointer"
             >
               <SlidersHorizontal className="size-4" />
               Filter
@@ -386,152 +522,7 @@ export default function CoursesExplorer({
         )}
       </div>
 
-      {filterDrawerOpen && (
-        <div className="fixed inset-x-0 bottom-0 top-[65px] z-50 md:hidden">
-          <button
-            type="button"
-            className="absolute inset-0 bg-black/50"
-            aria-label="Close filters"
-            onClick={() => setFilterDrawerOpen(false)}
-          />
-          <aside
-            className="absolute inset-y-0 right-0 flex w-full max-w-sm flex-col border-l border-neutral-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-950"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="course-filters-title"
-          >
-            <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4 dark:border-neutral-800">
-              <h2
-                id="course-filters-title"
-                className="text-lg font-semibold text-neutral-900 dark:text-white"
-              >
-                Filters
-              </h2>
-              <button
-                type="button"
-                onClick={() => setFilterDrawerOpen(false)}
-                aria-label="Close filters"
-                className="rounded-md p-2 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-white"
-              >
-                <X className="size-5" />
-              </button>
-            </div>
 
-            <div className="flex-1 space-y-6 overflow-y-auto px-5 py-5">
-              <fieldset>
-                <legend className="mb-3 text-sm font-semibold text-neutral-900 dark:text-white">
-                  Course category
-                </legend>
-                <div className="flex flex-col gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedCategoryId("all")}
-                    aria-pressed={selectedCategoryId === "all"}
-                    className={`flex items-center justify-between rounded-md px-3 py-2 text-left text-sm ${
-                      selectedCategoryId === "all"
-                        ? "bg-blue-50 font-semibold text-[#1550A5] dark:bg-blue-950/40 dark:text-blue-300"
-                        : "text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
-                    }`}
-                  >
-                    All Courses
-                    <span>{categoryCounts.all || 0}</span>
-                  </button>
-                  {categories.map((category) => (
-                    <button
-                      key={category.id}
-                      type="button"
-                      onClick={() => setSelectedCategoryId(category.id)}
-                      aria-pressed={selectedCategoryId === category.id}
-                      className={`flex items-center justify-between rounded-md px-3 py-2 text-left text-sm ${
-                        selectedCategoryId === category.id
-                          ? "bg-blue-50 font-semibold text-[#1550A5] dark:bg-blue-950/40 dark:text-blue-300"
-                          : "text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
-                      }`}
-                    >
-                      {category.name}
-                      <span>{categoryCounts[category.id] || 0}</span>
-                    </button>
-                  ))}
-                </div>
-              </fieldset>
-
-              {popularTags.length > 0 && (
-                <fieldset>
-                  <legend className="mb-3 text-sm font-semibold text-neutral-900 dark:text-white">
-                    Technologies
-                  </legend>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedTag("all")}
-                      aria-pressed={selectedTag === "all"}
-                      className={`rounded-md px-3 py-1.5 text-sm ${
-                        selectedTag === "all"
-                          ? "bg-[#1550A5] font-semibold text-white"
-                          : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
-                      }`}
-                    >
-                      All Tech
-                    </button>
-                    {popularTags.map((tag) => (
-                      <button
-                        key={tag}
-                        type="button"
-                        onClick={() =>
-                          setSelectedTag((selected) =>
-                            selected.toLowerCase() === tag.toLowerCase()
-                              ? "all"
-                              : tag
-                          )
-                        }
-                        aria-pressed={
-                          selectedTag.toLowerCase() === tag.toLowerCase()
-                        }
-                        className={`rounded-md px-3 py-1.5 text-sm ${
-                          selectedTag.toLowerCase() === tag.toLowerCase()
-                            ? "bg-[#1550A5] font-semibold text-white"
-                            : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
-                        }`}
-                      >
-                        {tag}
-                      </button>
-                    ))}
-                  </div>
-                </fieldset>
-              )}
-
-              <label className="flex cursor-pointer items-center gap-3 rounded-md border border-neutral-200 p-3 text-sm font-medium text-neutral-800 dark:border-neutral-800 dark:text-neutral-200">
-                <input
-                  type="checkbox"
-                  checked={placementOnly}
-                  onChange={(event) => setPlacementOnly(event.target.checked)}
-                  className="size-4 accent-[#1550A5]"
-                />
-                Placement Assured
-              </label>
-            </div>
-
-            <div className="flex gap-3 border-t border-neutral-200 p-4 dark:border-neutral-800">
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-neutral-300 text-sm font-medium text-neutral-800 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
-              >
-                <RotateCcw className="size-4" />
-                Reset
-              </button>
-              <button
-                type="button"
-                onClick={() => setFilterDrawerOpen(false)}
-                className="h-11 flex-1 rounded-lg bg-[#1550A5] text-sm font-semibold text-white hover:bg-[#124288]"
-              >
-                Show {filteredCourses.length}{" "}
-                {filteredCourses.length === 1 ? "course" : "courses"}
-              </button>
-            </div>
-          </aside>
-        </div>
-      )}
 
       {/* Results Bar */}
       <div className="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400">

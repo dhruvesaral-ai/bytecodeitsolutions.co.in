@@ -4,11 +4,12 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Sun, Moon, Menu, X, User } from "lucide-react";
+import { Sun, Moon, Menu, User } from "lucide-react";
 import { useTheme } from "@/context/theme-context";
 import { useSettings } from "@/context/setting-context";
 import { useEnquiry } from "@/context/enquiry-context";
 import { useAuth } from "@/context/auth-context";
+import { useSidebar } from "@/context/sidebar-context";
 import type { PageData } from "@/services/PageService";
 
 export interface NavItem {
@@ -77,7 +78,7 @@ export default function Header({ initialPages }: HeaderProps = {}) {
   const darkLogo =
     companyDarkThemedLogoUrl || "/bytecode-dark-theme-logo.png";
   const [mounted, setMounted] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { openNav, setNavItems: setSidebarNavItems } = useSidebar();
   const { openEnquiry } = useEnquiry();
   const { user, isAuthenticated } = useAuth();
   const [navItems, setNavItems] = useState<NavItem[]>(() =>
@@ -89,38 +90,12 @@ export default function Header({ initialPages }: HeaderProps = {}) {
   }, []);
 
   useEffect(() => {
-    setNavItems(
-      initialPages && initialPages.length > 0 ? pagesToNavItems(initialPages) : []
-    );
-  }, [initialPages]);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
-
-  // Handle ESC key to close mobile sidebar
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && mobileMenuOpen) {
-        setMobileMenuOpen(false);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [mobileMenuOpen]);
-
-  // Prevent background scroll when sidebar is open
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
+    if (initialPages && initialPages.length > 0) {
+      const items = pagesToNavItems(initialPages);
+      setNavItems(items);
+      setSidebarNavItems(items);
     }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [mobileMenuOpen]);
+  }, [initialPages, setSidebarNavItems]);
 
   const isDarkMode = mounted && resolvedTheme === "dark";
 
@@ -259,120 +234,12 @@ export default function Header({ initialPages }: HeaderProps = {}) {
 
           <button
             type="button"
-            onClick={() => setMobileMenuOpen(true)}
+            onClick={openNav}
             aria-label="Open navigation menu"
             className="flex h-9 w-9 items-center justify-center rounded-md border border-neutral-300 bg-white text-neutral-800 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] dark:border-neutral-700 dark:bg-black dark:text-neutral-200 dark:hover:bg-neutral-900 cursor-pointer"
           >
             <Menu className="h-5 w-5" />
           </button>
-        </div>
-      </div>
-
-      {/* Mobile Off-Canvas Sidebar (Sliding from Right) */}
-      {/* Backdrop */}
-      <div
-        className={`fixed inset-0 z-[60] bg-black/60 transition-opacity duration-300 md:hidden ${
-          mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        onClick={() => setMobileMenuOpen(false)}
-        aria-hidden="true"
-      />
-
-      {/* Sidebar Panel */}
-      <div
-        className={`fixed inset-y-0 right-0 z-[60] w-full max-w-xs bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out md:hidden ${
-          mobileMenuOpen ? "translate-x-0" : "translate-x-full pointer-events-none"
-        }`}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Mobile Navigation"
-      >
-        {/* Sidebar Header */}
-        <div className="flex h-16 items-center justify-between px-5 border-b border-neutral-200 dark:border-neutral-800">
-          <div className="flex items-center">
-            <Image
-              src={lightLogo}
-              alt={displayName}
-              width={160}
-              height={53}
-              className="h-8 w-auto object-contain dark:hidden"
-            />
-            <Image
-              src={darkLogo}
-              alt={displayName}
-              width={160}
-              height={53}
-              className="hidden h-8 w-auto object-contain dark:block"
-            />
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(false)}
-            aria-label="Close navigation menu"
-            className="rounded-md p-1.5 text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        {/* Sidebar Navigation Links */}
-        <div className="flex-1 overflow-y-auto px-4 py-6">
-          <nav className="flex flex-col space-y-1.5" aria-label="Mobile Navigation Links">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`rounded-md px-3.5 py-2.5 text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-neutral-100 font-semibold text-[#1550A5] dark:bg-neutral-800 dark:text-blue-400"
-                      : "text-neutral-700 hover:bg-neutral-50 hover:text-black dark:text-neutral-300 dark:hover:bg-neutral-800/60 dark:hover:text-white"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* Sidebar Bottom Footer Actions */}
-        <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 space-y-3">
-          {isAuthenticated && (
-            <Link
-              href="/profile"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center justify-center gap-2 rounded-md border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 px-4 py-2.5 text-sm font-semibold text-neutral-800 dark:text-neutral-200 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer"
-            >
-              <User className="size-4 text-[#1550A5] dark:text-blue-400" />
-              <span>My Profile ({user?.username})</span>
-            </Link>
-          )}
-          <button
-            type="button"
-            onClick={() => {
-              setMobileMenuOpen(false);
-              openEnquiry("course");
-            }}
-            className="w-full flex items-center justify-center rounded-md bg-[#F58216] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#DE5426] active:bg-[#c7451a] cursor-pointer"
-          >
-            Enquire Now
-          </button>
-
-          <div className="flex items-center justify-between pt-1 px-1 text-xs text-neutral-500 dark:text-neutral-400">
-            <span>Appearance</span>
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 transition-colors cursor-pointer"
-            >
-              {isDarkMode ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
-              <span>{isDarkMode ? "Dark" : "Light"}</span>
-            </button>
-          </div>
         </div>
       </div>
     </header>

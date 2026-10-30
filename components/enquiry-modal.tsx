@@ -366,19 +366,13 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
         {/* Header */}
         <div className="flex items-start justify-between pt-2 pb-4">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center">
               <h2
                 id="enquiry-modal-title"
                 className="text-lg font-bold tracking-tight text-white sm:text-xl"
               >
                 {form.step === "otp" ? "Verify Mobile Number" : "Enquire Now"}
               </h2>
-              {form.step === "otp" && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-medium text-white border border-white/30">
-                  <ShieldCheck className="size-3" />
-                  <span>Security Step</span>
-                </span>
-              )}
             </div>
             <p className="mt-1 text-xs text-blue-100/80 leading-relaxed">
               {form.step === "otp"

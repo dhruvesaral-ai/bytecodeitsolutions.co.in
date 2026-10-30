@@ -6,6 +6,8 @@ import { ThemeProvider } from "@/context/theme-context";
 import { SettingsProvider } from "@/context/setting-context";
 import { AuthProvider } from "@/context/auth-context";
 import { EnquiryProvider } from "@/context/enquiry-context";
+import { SidebarProvider } from "@/context/sidebar-context";
+import AppSidebar from "@/components/sidebar";
 import SmoothScroll from "@/components/smooth-scroll";
 import Header from "@/components/header";
 import { pageService } from "@/services/PageService";
@@ -16,7 +18,7 @@ import AnimatedBanner from "@/components/animated-banner";
 import ScrollToTop from "@/components/scroll-to-top";
 async function HeaderSlot() {
   const pages = await pageService.getPages();
-  console.log("Pages :",pages);
+  console.log("Pages :", pages);
   return <Header initialPages={pages} />;
 }
 
@@ -77,12 +79,24 @@ export const metadata: Metadata = {
       { url: "/favicons/favicon.ico" },
       { url: "/favicons/favicon-16x16.png", sizes: "16x16", type: "image/png" },
       { url: "/favicons/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicons/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/favicons/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+      {
+        url: "/favicons/android-chrome-192x192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        url: "/favicons/android-chrome-512x512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
     ],
     shortcut: "/favicons/favicon.ico",
     apple: [
-      { url: "/favicons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      {
+        url: "/favicons/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
     ],
   },
   manifest: "/site.webmanifest",
@@ -125,25 +139,30 @@ export default async function RootLayout({
         <ThemeProvider>
           <SettingsProvider initialSettings={settings}>
             <AuthProvider>
-            <EnquiryProvider>
-              <div className="sticky top-0 z-40 w-full">
-                <AnimatedBanner />
-            <Suspense
-              fallback={
-                <div
-                  className="h-16 w-full border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black"
-                  aria-busy="true"
-                />
-              }
-            >
-              <HeaderSlot />
-            </Suspense>
-              </div>
-              <SmoothScroll>{children}</SmoothScroll>
-            <Suspense fallback={null}>
-              <Footer />
-            </Suspense>
-            </EnquiryProvider>
+              <EnquiryProvider>
+                <SidebarProvider>
+                <div className="sticky top-0 z-40 w-full">
+                  <AnimatedBanner />
+                  <Suspense
+                    fallback={
+                      <div
+                        className="h-16 w-full border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black"
+                        aria-busy="true"
+                      />
+                    }
+                  >
+                    <HeaderSlot />
+                  </Suspense>
+                </div>
+                <SmoothScroll>{children}</SmoothScroll>
+                <Suspense fallback={null}>
+                  <Footer />
+                </Suspense>
+                  <Suspense fallback={null}>
+                    <AppSidebar />
+                  </Suspense>
+                </SidebarProvider>
+              </EnquiryProvider>
             </AuthProvider>
           </SettingsProvider>
         </ThemeProvider>
