@@ -164,15 +164,18 @@ export default function PlacementGuaranteedSection({
                       }`}
                   >
                     {/* Media Column */}
-                    <div className="lg:col-span-4 xl:col-span-4 w-full flex justify-center">
-                      <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-xl bg-neutral-900 group">
-                        <Image
-                          src={course.courseImgUrl}
-                          alt={course.name}
-                          fill
-                          sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 340px, 360px"
-                          className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
+                    <div className="lg:col-span-4 xl:col-span-4 w-full flex justify-center items-start">
+                      <div className="relative w-full rounded-2xl overflow-hidden shadow-xl bg-neutral-900 group">
+                        <Link href={courseHref} className="block w-full" tabIndex={-1} aria-hidden="true">
+                          <Image
+                            src={course.courseImgUrl}
+                            alt={course.name}
+                            width={800}
+                            height={450}
+                            sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 340px, 360px"
+                            className="w-full h-auto block transition-transform duration-500 group-hover:scale-105"
+                          />
+                        </Link>
                       </div>
                     </div>
 
