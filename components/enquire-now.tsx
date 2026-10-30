@@ -63,6 +63,11 @@ function EnquireNowFab({ mode }: EnquireNowProps) {
               <CheckCircle2 className="size-5" aria-hidden="true" />
               <span className="text-sm font-semibold whitespace-nowrap">Submitted!</span>
             </>
+          ) : form.step === "otp" ? (
+            <>
+              <CheckCircle2 className="size-4.5" aria-hidden="true" />
+              <span className="text-sm font-semibold whitespace-nowrap">Verify & Submit</span>
+            </>
           ) : (
             <>
               <Send className="size-4.5" aria-hidden="true" />

@@ -4,11 +4,11 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Sun, Moon, Menu, X } from "lucide-react";
+import { Sun, Moon, Menu, X, User } from "lucide-react";
 import { useTheme } from "@/context/theme-context";
 import { useSettings } from "@/context/setting-context";
 import { useEnquiry } from "@/context/enquiry-context";
-import LoginModal from "@/components/login";
+import { useAuth } from "@/context/auth-context";
 import type { PageData } from "@/services/PageService";
 
 export interface NavItem {
@@ -78,8 +78,8 @@ export default function Header({ initialPages }: HeaderProps = {}) {
     companyDarkThemedLogoUrl || "/bytecode-dark-theme-logo.png";
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const { openEnquiry } = useEnquiry();
+  const { user, isAuthenticated } = useAuth();
   const [navItems, setNavItems] = useState<NavItem[]>(() =>
     initialPages && initialPages.length > 0 ? pagesToNavItems(initialPages) : []
   );
@@ -202,6 +202,18 @@ export default function Header({ initialPages }: HeaderProps = {}) {
             )}
           </button>
 
+          {/* Profile Icon (when authenticated) */}
+          {isAuthenticated && (
+            <Link
+              href="/profile"
+              aria-label="View Profile"
+              title={user?.profile?.name || user?.username || "My Profile"}
+              className="hidden md:flex h-9 w-9 items-center justify-center rounded-full border border-neutral-300 bg-white text-[#1550A5] transition-colors hover:bg-neutral-100 hover:border-[#1550A5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] dark:border-neutral-700 dark:bg-black dark:text-blue-400 dark:hover:bg-neutral-900 cursor-pointer"
+            >
+              <User className="h-4.5 w-4.5" />
+            </Link>
+          )}
+
           <button
             type="button"
             onClick={() => openEnquiry("course")}
@@ -209,19 +221,20 @@ export default function Header({ initialPages }: HeaderProps = {}) {
           >
             Enquire Now
           </button>
-
-          {/* Login Button */}
-          <button
-            type="button"
-            onClick={() => setLoginModalOpen(true)}
-            className="rounded-md bg-[#1550A5] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#124288] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] focus-visible:ring-offset-2 active:bg-[#0e336b] cursor-pointer"
-          >
-            Login
-          </button>
         </div>
 
-        {/* Mobile Controls (Theme Toggle & Menu Button) */}
+        {/* Mobile Controls (Profile & Theme Toggle & Menu Button) */}
         <div className="flex items-center gap-2 md:hidden">
+          {isAuthenticated && (
+            <Link
+              href="/profile"
+              aria-label="View Profile"
+              title={user?.profile?.name || user?.username || "My Profile"}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-300 bg-white text-[#1550A5] transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] dark:border-neutral-700 dark:bg-black dark:text-blue-400 dark:hover:bg-neutral-900 cursor-pointer"
+            >
+              <User className="h-4.5 w-4.5" />
+            </Link>
+          )}
           <button
             type="button"
             onClick={toggleTheme}
@@ -328,6 +341,16 @@ export default function Header({ initialPages }: HeaderProps = {}) {
 
         {/* Sidebar Bottom Footer Actions */}
         <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 space-y-3">
+          {isAuthenticated && (
+            <Link
+              href="/profile"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 rounded-md border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 px-4 py-2.5 text-sm font-semibold text-neutral-800 dark:text-neutral-200 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer"
+            >
+              <User className="size-4 text-[#1550A5] dark:text-blue-400" />
+              <span>My Profile ({user?.username})</span>
+            </Link>
+          )}
           <button
             type="button"
             onClick={() => {
@@ -337,16 +360,6 @@ export default function Header({ initialPages }: HeaderProps = {}) {
             className="w-full flex items-center justify-center rounded-md bg-[#F58216] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#DE5426] active:bg-[#c7451a] cursor-pointer"
           >
             Enquire Now
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setMobileMenuOpen(false);
-              setLoginModalOpen(true);
-            }}
-            className="w-full flex items-center justify-center rounded-md bg-[#1550A5] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#124288] cursor-pointer"
-          >
-            Login
           </button>
 
           <div className="flex items-center justify-between pt-1 px-1 text-xs text-neutral-500 dark:text-neutral-400">
@@ -362,12 +375,6 @@ export default function Header({ initialPages }: HeaderProps = {}) {
           </div>
         </div>
       </div>
-
-      {/* Login Modal */}
-      <LoginModal
-        isOpen={loginModalOpen}
-        onClose={() => setLoginModalOpen(false)}
-      />
     </header>
   );
 }

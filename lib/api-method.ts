@@ -13,17 +13,24 @@ export class ApiRequestError extends Error {
 async function request<T>(
   method: string,
   endpoint: string,
-  body?: unknown
+  body?: unknown,
+  customHeaders?: Record<string, string>
 ): Promise<T | null> {
   const cleanEndpoint = endpoint.replace(/^\/+/, "");
   const url = `${BACKEND_URL.replace(/\/+$/, "")}/${cleanEndpoint}`;
+
+  const headers: Record<string, string> = {
+    ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
+    ...customHeaders,
+  };
 
   let response: Response;
   try {
     response = await fetch(url, {
       method,
       cache: "no-store",
-      headers: body === undefined ? undefined : { "Content-Type": "application/json" },
+      credentials: "include",
+      headers: Object.keys(headers).length > 0 ? headers : undefined,
       body: body === undefined ? undefined : JSON.stringify(body),
     });
   } catch (error) {
@@ -34,7 +41,8 @@ async function request<T>(
         response = await fetch(fallbackUrl, {
           method,
           cache: "no-store",
-          headers: body === undefined ? undefined : { "Content-Type": "application/json" },
+          credentials: "include",
+          headers: Object.keys(headers).length > 0 ? headers : undefined,
           body: body === undefined ? undefined : JSON.stringify(body),
         });
       } catch {
@@ -58,27 +66,40 @@ async function request<T>(
   return responseBody ? (JSON.parse(responseBody) as T) : null;
 }
 
-export function get<T>(endpoint: string): Promise<T | null> {
-  return request<T>("GET", endpoint);
+export function get<T>(endpoint: string, headers?: Record<string, string>): Promise<T | null> {
+  return request<T>("GET", endpoint, undefined, headers);
 }
 
-export function post<T>(endpoint: string, body: unknown): Promise<T | null> {
-  return request<T>("POST", endpoint, body);
+export function post<T>(
+  endpoint: string,
+  body?: unknown,
+  headers?: Record<string, string>
+): Promise<T | null> {
+  return request<T>("POST", endpoint, body, headers);
 }
 
-export function put<T>(endpoint: string, body: unknown): Promise<T | null> {
-  return request<T>("PUT", endpoint, body);
+export function put<T>(
+  endpoint: string,
+  body?: unknown,
+  headers?: Record<string, string>
+): Promise<T | null> {
+  return request<T>("PUT", endpoint, body, headers);
 }
 
-export function patch<T>(endpoint: string, body: unknown): Promise<T | null> {
-  return request<T>("PATCH", endpoint, body);
+export function patch<T>(
+  endpoint: string,
+  body?: unknown,
+  headers?: Record<string, string>
+): Promise<T | null> {
+  return request<T>("PATCH", endpoint, body, headers);
 }
 
 export function deleteRequest<T>(
   endpoint: string,
-  body?: unknown
+  body?: unknown,
+  headers?: Record<string, string>
 ): Promise<T | null> {
-  return request<T>("DELETE", endpoint, body);
+  return request<T>("DELETE", endpoint, body, headers);
 }
 
 export { deleteRequest as delete };
