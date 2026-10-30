@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { X, CheckCircle2 } from "lucide-react";
+import { X, CheckCircle2, Send, Loader2 } from "lucide-react";
 import { courseService, type Course } from "@/services/CourseService";
 import { createWebLead } from "@/services/LeadService";
 
@@ -179,7 +179,7 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
   
   return createPortal(
     <div
-      className="fixed inset-0 z-40 flex items-end justify-center bg-[#04142C]/60 animate-backdrop-fade"
+      className="fixed inset-0 z-40 flex items-end justify-center bg-[#04142C]/60 animate-backdrop-fade md:items-center md:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="enquiry-modal-title"
@@ -187,11 +187,11 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
     >
       {/* Bottom Sheet */}
       <div
-        className="relative w-full animate-sheet-up rounded-t-2xl bg-[#1550A5] p-6 pb-28 shadow-2xl shadow-black/40 max-h-[85dvh] overflow-y-auto"
+        className="relative w-full rounded-t-2xl bg-[#1550A5] p-6 pb-28 shadow-2xl shadow-black/40 max-h-[85dvh] overflow-y-auto animate-sheet-up md:max-w-xl md:rounded-2xl md:p-8 md:pb-8 md:animate-modal-pop"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Drag handle */}
-        <div className="absolute left-1/2 top-2 h-1 w-10 -translate-x-1/2 rounded-full bg-white/40" />
+        <div className="absolute left-1/2 top-2 h-1 w-10 -translate-x-1/2 rounded-full bg-white/40 md:hidden" />
 
         {/* Header */}
         <div className="flex items-start justify-between pt-2 pb-4">
@@ -244,8 +244,8 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                   value={form.firstName}
                   onChange={(e) => form.setFirstName(e.target.value)}
                   placeholder="Aarav"
-                  autoFocus
-                  className="h-10 w-full rounded-md border border-white/30 bg-white px-3 text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-[#F58216] focus:outline-none focus:ring-1 focus:ring-[#F58216]"
+                  
+                  className="h-10 w-full rounded-md border border-white/30 bg-white px-3 text-base sm:text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-[#F58216] focus:outline-none focus:ring-1 focus:ring-[#F58216]"
                 />
               </div>
               <div className="space-y-1.5">
@@ -261,7 +261,7 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                   value={form.lastName}
                   onChange={(e) => form.setLastName(e.target.value)}
                   placeholder="Sharma"
-                  className="h-10 w-full rounded-md border border-white/30 bg-white px-3 text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-[#F58216] focus:outline-none focus:ring-1 focus:ring-[#F58216]"
+                  className="h-10 w-full rounded-md border border-white/30 bg-white px-3 text-base sm:text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-[#F58216] focus:outline-none focus:ring-1 focus:ring-[#F58216]"
                 />
               </div>
             </div>
@@ -287,7 +287,7 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                   value={form.phone}
                   onChange={(e) => form.handlePhoneChange(e.target.value)}
                   placeholder="Enter 10-digit number"
-                  className="w-full bg-transparent px-3 text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:outline-none"
+                  className="w-full bg-transparent px-3 text-base sm:text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:outline-none"
                 />
               </div>
               {form.phone.length > 0 && form.phone.length < 10 && (
@@ -311,7 +311,7 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                   value={form.courseId}
                   onChange={(e) => form.setCourseId(e.target.value)}
                   disabled={form.coursesLoading}
-                  className="h-10 w-full rounded-md border border-white/30 bg-white px-3 text-sm font-medium text-neutral-900 focus:border-[#F58216] focus:outline-none focus:ring-1 focus:ring-[#F58216] disabled:opacity-50"
+                  className="h-10 w-full rounded-md border border-white/30 bg-white px-3 text-base sm:text-sm font-medium text-neutral-900 focus:border-[#F58216] focus:outline-none focus:ring-1 focus:ring-[#F58216] disabled:opacity-50"
                 >
                   <option value="">
                     {form.coursesLoading ? "Loading courses..." : "Select a course"}
@@ -340,7 +340,7 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                   value={form.message}
                   onChange={(e) => form.setMessage(e.target.value)}
                   placeholder="Tell us about your project or requirement..."
-                  className="w-full resize-none rounded-md border border-white/30 bg-white px-3 py-2 text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-[#F58216] focus:outline-none focus:ring-1 focus:ring-[#F58216]"
+                  className="w-full resize-none rounded-md border border-white/30 bg-white px-3 py-2 text-base sm:text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-[#F58216] focus:outline-none focus:ring-1 focus:ring-[#F58216]"
                 />
               </div>
             )}
@@ -356,6 +356,26 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                 {form.errorMessage}
               </p>
             )}
+            {/* Desktop Direct Submit Action */}
+            <div className="hidden md:flex items-center justify-end pt-2">
+              <button
+                type="submit"
+                disabled={form.isSubmitting}
+                className="inline-flex items-center gap-2 rounded-lg bg-[#F58216] px-6 py-2.5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-[#DE5426] active:bg-[#c7451a] disabled:opacity-50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                {form.isSubmitting ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                    <span>Submitting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="size-4" aria-hidden="true" />
+                    <span>Submit Enquiry</span>
+                  </>
+                )}
+              </button>
+            </div>
           </form>
         )}
       </div>

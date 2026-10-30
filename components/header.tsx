@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { Sun, Moon, Menu, X } from "lucide-react";
 import { useTheme } from "@/context/theme-context";
 import { useSettings } from "@/context/setting-context";
+import { useEnquiry } from "@/context/enquiry-context";
 import LoginModal from "@/components/login";
 import type { PageData } from "@/services/PageService";
 
@@ -78,6 +79,7 @@ export default function Header({ initialPages }: HeaderProps = {}) {
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const { openEnquiry } = useEnquiry();
   const [navItems, setNavItems] = useState<NavItem[]>(() =>
     initialPages && initialPages.length > 0 ? pagesToNavItems(initialPages) : []
   );
@@ -123,7 +125,7 @@ export default function Header({ initialPages }: HeaderProps = {}) {
   const isDarkMode = mounted && resolvedTheme === "dark";
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-neutral-200 bg-white dark:border-neutral-800 dark:bg-black">
+    <header className="w-full border-b border-neutral-200 bg-white dark:border-neutral-800 dark:bg-black">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left: Company Logo */}
         <div className="flex items-center">
@@ -202,7 +204,7 @@ export default function Header({ initialPages }: HeaderProps = {}) {
 
           <button
             type="button"
-            onClick={() => setLoginModalOpen(true)}
+            onClick={() => openEnquiry("course")}
             className="hidden md:block rounded-md bg-[#F58216] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#DE5426] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F58216] focus-visible:ring-offset-2 active:bg-[#c7451a] cursor-pointer"
           >
             Enquire Now
@@ -256,7 +258,7 @@ export default function Header({ initialPages }: HeaderProps = {}) {
       {/* Mobile Off-Canvas Sidebar (Sliding from Right) */}
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-50 bg-black/60 transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 z-[60] bg-black/60 transition-opacity duration-300 md:hidden ${
           mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setMobileMenuOpen(false)}
@@ -265,7 +267,7 @@ export default function Header({ initialPages }: HeaderProps = {}) {
 
       {/* Sidebar Panel */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-full max-w-xs bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed inset-y-0 right-0 z-[60] w-full max-w-xs bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out md:hidden ${
           mobileMenuOpen ? "translate-x-0" : "translate-x-full pointer-events-none"
         }`}
         role="dialog"
@@ -326,6 +328,16 @@ export default function Header({ initialPages }: HeaderProps = {}) {
 
         {/* Sidebar Bottom Footer Actions */}
         <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 space-y-3">
+          <button
+            type="button"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              openEnquiry("course");
+            }}
+            className="w-full flex items-center justify-center rounded-md bg-[#F58216] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#DE5426] active:bg-[#c7451a] cursor-pointer"
+          >
+            Enquire Now
+          </button>
           <button
             type="button"
             onClick={() => {

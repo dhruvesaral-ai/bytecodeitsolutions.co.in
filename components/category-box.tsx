@@ -3,7 +3,7 @@
 import React, { useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
-import { Navigation, Pagination } from "swiper/modules";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import CourseCard from "@/components/cards";
 import type { Course, CourseCategory } from "@/services/CourseService";
@@ -63,7 +63,7 @@ export default function CategoryBox({ category, courses }: CategoryBoxProps) {
 
       {/* Courses Swiper Carousel (Max 4 at a time) */}
       <Swiper
-        modules={[Navigation, Pagination]}
+        modules={[Navigation, Pagination, Autoplay]}
         onSwiper={(swiper) => {
           swiperRef.current = swiper;
           setIsBeginning(swiper.isBeginning);
@@ -73,15 +73,25 @@ export default function CategoryBox({ category, courses }: CategoryBoxProps) {
           setIsBeginning(swiper.isBeginning);
           setIsEnd(swiper.isEnd);
         }}
-        spaceBetween={20}
-        slidesPerView={1}
+        autoplay={
+          courses.length > 1
+            ? {
+                delay: 3500,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+              }
+            : false
+        }
+        speed={600}
+        spaceBetween={16}
+        slidesPerView={1.25}
         breakpoints={{
           640: {
-            slidesPerView: 2,
+            slidesPerView: 2.2,
             spaceBetween: 16,
           },
           1024: {
-            slidesPerView: 3,
+            slidesPerView: 3.2,
             spaceBetween: 20,
           },
           1280: {

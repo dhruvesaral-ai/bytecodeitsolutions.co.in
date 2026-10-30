@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import { Poppins } from "next/font/google";
 import { ThemeProvider } from "@/context/theme-context";
 import { SettingsProvider } from "@/context/setting-context";
+import { EnquiryProvider } from "@/context/enquiry-context";
 import SmoothScroll from "@/components/smooth-scroll";
 import Header from "@/components/header";
 import { pageService } from "@/services/PageService";
@@ -122,7 +123,9 @@ export default async function RootLayout({
         </Suspense>
         <ThemeProvider>
           <SettingsProvider initialSettings={settings}>
-            <AnimatedBanner />
+            <EnquiryProvider>
+              <div className="sticky top-0 z-40 w-full">
+                <AnimatedBanner />
             <Suspense
               fallback={
                 <div
@@ -133,10 +136,12 @@ export default async function RootLayout({
             >
               <HeaderSlot />
             </Suspense>
-            <SmoothScroll>{children}</SmoothScroll>
+              </div>
+              <SmoothScroll>{children}</SmoothScroll>
             <Suspense fallback={null}>
               <Footer />
             </Suspense>
+            </EnquiryProvider>
           </SettingsProvider>
         </ThemeProvider>
       </body>
