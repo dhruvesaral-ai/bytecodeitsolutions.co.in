@@ -125,11 +125,9 @@ export const authService = {
    */
   async refresh(refreshToken?: string, rotateRefreshToken: boolean = false): Promise<RefreshTokenResponse> {
     try {
-      const headers = refreshToken ? { "x-refresh-token": refreshToken } : undefined;
       const res = await post<RefreshTokenResponse>(
         "auth/refresh",
-        { refreshToken, rotateRefreshToken },
-        headers
+        { refreshToken, rotateRefreshToken }
       );
       return res ?? { success: false, error: "No response received" };
     } catch (error: unknown) {

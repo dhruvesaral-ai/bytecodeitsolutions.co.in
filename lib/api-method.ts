@@ -29,7 +29,6 @@ async function request<T>(
     response = await fetch(url, {
       method,
       cache: "no-store",
-      credentials: "include",
       headers: Object.keys(headers).length > 0 ? headers : undefined,
       body: body === undefined ? undefined : JSON.stringify(body),
     });
@@ -41,7 +40,6 @@ async function request<T>(
         response = await fetch(fallbackUrl, {
           method,
           cache: "no-store",
-          credentials: "include",
           headers: Object.keys(headers).length > 0 ? headers : undefined,
           body: body === undefined ? undefined : JSON.stringify(body),
         });

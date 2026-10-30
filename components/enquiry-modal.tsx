@@ -37,7 +37,8 @@ export function useEnquiryForm(
   const [phone, setPhone] = useState("");
   const [courseId, setCourseId] = useState("");
   const [message, setMessage] = useState("");
-  const [courses, setCourses] = useState<Course[] | null>(null);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [coursesLoading, setCoursesLoading] = useState(mode === "course");
   const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -74,20 +75,31 @@ export function useEnquiryForm(
     phone.length === 10 &&
     (mode === "course" ? courseId !== "" : true);
 
-  // Load the course list the first time the sheet is opened
+  // Load the live course list from backend API on mount
   useEffect(() => {
-    if (!isOpen || mode !== "course" || courses !== null) return;
+    if (mode !== "course") return;
 
     let cancelled = false;
-    courseService.getCourses().then((allCourses) => {
-      if (cancelled) return;
-      setCourses(allCourses.filter((course) => course.status === "active"));
-    });
+    setCoursesLoading(true);
+
+    courseService
+      .getCourses()
+      .then((allCourses) => {
+        if (cancelled) return;
+        const active = allCourses.filter((course) => course.status === "active");
+        setCourses(active.length > 0 ? active : allCourses);
+      })
+      .catch((err) => {
+        console.error("Failed to load live courses:", err);
+      })
+      .finally(() => {
+        if (!cancelled) setCoursesLoading(false);
+      });
 
     return () => {
       cancelled = true;
     };
-  }, [isOpen, mode, courses]);
+  }, [mode]);
 
   const reset = useCallback(() => {
     if (!user) {
@@ -253,7 +265,7 @@ export function useEnquiryForm(
     message,
     setMessage,
     courses,
-    coursesLoading: mode === "course" && courses === null,
+    coursesLoading,
     isValid,
     otp,
     setOtp,
@@ -578,11 +590,13 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                   id="enquiry-course"
                   value={form.courseId}
                   onChange={(e) => form.setCourseId(e.target.value)}
-                  disabled={form.coursesLoading}
+                  disabled={form.isSubmitting || (form.coursesLoading && form.courses.length === 0)}
                   className="h-10 w-full rounded-md border border-white/30 bg-white px-3 text-base sm:text-sm font-medium text-neutral-900 focus:border-[#F58216] focus:outline-none focus:ring-1 focus:ring-[#F58216] disabled:opacity-50"
                 >
                   <option value="">
-                    {form.coursesLoading ? "Loading courses..." : "Select a course"}
+                    {form.coursesLoading && form.courses.length === 0
+                      ? "Loading courses..."
+                      : "Select a course"}
                   </option>
                   {(form.courses ?? []).map((course) => (
                     <option key={course.id} value={course.id}>
