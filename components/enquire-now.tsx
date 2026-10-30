@@ -46,7 +46,7 @@ function EnquireNowFab({ mode }: EnquireNowProps) {
         disabled={isOpen && (form.isSubmitting || form.isSubmitted)}
         aria-label={isOpen ? "Submit enquiry" : "Enquire now"}
         aria-expanded={isOpen}
-        className={`fixed bottom-6 right-6 z-50 flex items-center justify-center rounded-full bg-[#F58216] text-white shadow-xl transition-all duration-300 ease-out hover:bg-[#DE5426] active:bg-[#c7451a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F58216] focus-visible:ring-offset-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${
+        className={`fixed bottom-6 right-6 z-50 md:hidden flex items-center justify-center rounded-full bg-[#F58216] text-white shadow-xl transition-all duration-300 ease-out hover:bg-[#DE5426] active:bg-[#c7451a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F58216] focus-visible:ring-offset-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${
           isOpen
             ? "h-13 sm:h-14 px-5 sm:px-6 gap-2 shadow-2xl scale-100 animate-none"
             : "size-14 animate-bounce hover:scale-105 active:scale-95"
