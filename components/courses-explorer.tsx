@@ -35,6 +35,38 @@ export default function CoursesExplorer({
     setFilterContent,
   } = useSidebar();
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState<number>(100);
+
+  // Measure exact sticky header height so search bar sticks cleanly below it without overlap
+  useEffect(() => {
+    const updateHeaderHeight = () => {
+      const headerEl =
+        document.getElementById("main-sticky-header") ||
+        (document.querySelector(".sticky.top-0") as HTMLElement | null);
+      if (headerEl) {
+        setHeaderHeight(headerEl.offsetHeight);
+      }
+    };
+
+    updateHeaderHeight();
+    window.addEventListener("resize", updateHeaderHeight);
+
+    const headerEl =
+      document.getElementById("main-sticky-header") ||
+      (document.querySelector(".sticky.top-0") as HTMLElement | null);
+    let resizeObserver: ResizeObserver | null = null;
+    if (headerEl && typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => {
+        updateHeaderHeight();
+      });
+      resizeObserver.observe(headerEl);
+    }
+
+    return () => {
+      window.removeEventListener("resize", updateHeaderHeight);
+      if (resizeObserver) resizeObserver.disconnect();
+    };
+  }, []);
 
   // Extract popular tags across courses
   const popularTags = useMemo(() => {
@@ -315,7 +347,11 @@ export default function CoursesExplorer({
   return (
     <section className="w-full space-y-8" aria-label="Course catalog">
       {/* Search and Main Controls */}
-      <div className="sticky top-[65px] z-30 -mx-4 flex flex-col gap-4 border-b border-neutral-200 bg-white px-4 py-3 dark:border-neutral-800 dark:bg-black md:static md:mx-0 md:border-0 md:bg-transparent md:p-0 md:dark:bg-transparent">
+      {/* Sticky Search and Main Controls Bar (Mobile & Desktop) */}
+      <div
+        className="sticky top-[98px] sm:top-[100px] z-30 -mx-4 border-b border-neutral-200/80 bg-white/95 px-4 py-3 backdrop-blur-md dark:border-neutral-800/80 dark:bg-black/95 sm:mx-0 sm:rounded-xl sm:border sm:border-neutral-200 sm:px-4 sm:py-3.5 sm:shadow-xs dark:sm:border-neutral-800"
+        style={{ top: `${headerHeight}px` }}
+      >
         {/* Top Controls Row: Search Bar & Sort Dropdown */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           {/* Search Input */}
@@ -441,9 +477,12 @@ export default function CoursesExplorer({
             </div>
           </div>
         </div>
+      </div>
 
+      {/* Desktop Category Tabs & Technology Filter Chips */}
+      <div className="hidden flex-col gap-3 md:flex">
         {/* Category Tabs */}
-        <div className="hidden flex-wrap items-center gap-2 border-b border-neutral-200 pb-3 dark:border-neutral-800 md:flex">
+        <div className="flex flex-wrap items-center gap-2 border-b border-neutral-200 pb-3 dark:border-neutral-800">
           <button
             type="button"
             onClick={() => setSelectedCategoryId("all")}
@@ -478,7 +517,7 @@ export default function CoursesExplorer({
 
         {/* Technology Filter Chips */}
         {popularTags.length > 0 && (
-          <div className="hidden flex-wrap items-center gap-1.5 text-xs md:flex">
+          <div className="flex flex-wrap items-center gap-1.5 text-xs">
             <span className="text-neutral-500 dark:text-neutral-400 mr-1 flex items-center gap-1 font-medium">
               <SlidersHorizontal className="size-3" />
               Technologies:

@@ -141,7 +141,7 @@ export default async function RootLayout({
             <AuthProvider>
               <EnquiryProvider>
                 <SidebarProvider>
-                <div className="sticky top-0 z-40 w-full">
+                  <div id="main-sticky-header" className="sticky top-0 z-40 w-full">
                   <AnimatedBanner />
                   <Suspense
                     fallback={
