@@ -147,10 +147,6 @@ export default function PlacementGuaranteedSection({
                 : `${course.duration} Months`
               : "";
 
-            // Portrait art is optional; when absent the landscape asset is used
-            // on every breakpoint and the frame must stay landscape too.
-            const portraitImgUrl = course.portraitImgUrl;
-
             return (
               <div
                 key={course.id}
@@ -167,32 +163,16 @@ export default function PlacementGuaranteedSection({
                     className={`grid grid-cols-1 lg:grid-cols-12 gap-8 ${isReversed ? "lg:[&>*:first-child]:order-2" : ""
                       }`}
                   >
-                    {/* Media Column (Image & Live Badge) */}
+                    {/* Media Column */}
                     <div className="lg:col-span-4 xl:col-span-4 w-full flex justify-center">
-                      <div
-                        className={`relative w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-xl bg-neutral-900 group ${portraitImgUrl
-                            ? "lg:aspect-[9/16]"
-                            : ""
-                          }`}
-                      >
-                        {/* Landscape course image (mobile, and desktop when no portrait asset exists) */}
+                      <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-xl bg-neutral-900 group">
                         <Image
                           src={course.courseImgUrl}
                           alt={course.name}
                           fill
-                          className={`w-full object-cover transition-transform duration-500 group-hover:scale-105 ${portraitImgUrl ? "lg:hidden" : ""
-                            }`}
+                          sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 340px, 360px"
+                          className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
-                        {/* Large screens: portrait course image */}
-                        {portraitImgUrl && (
-                          <Image
-                            src={portraitImgUrl}
-                            alt={course.name}
-                            fill
-                            sizes="(max-width: 1280px) 340px, 360px"
-                            className="hidden object-cover transition-transform duration-500 group-hover:scale-105 lg:block"
-                          />
-                        )}
                       </div>
                     </div>
 
