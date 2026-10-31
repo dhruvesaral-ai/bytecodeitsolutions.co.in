@@ -13,7 +13,14 @@ interface PageProps {
 
 async function DynamicPageContent({ props }: { props: PageProps }) {
   const { "route-name": routeName } = await props.params;
-  const page = await pageService.getPageByRoute(routeName);
+  let page = await pageService.getPageByRoute(routeName);
+
+  // Fallback between training and trainings routes if needed
+  if (!page && (routeName.toLowerCase() === "training" || routeName.toLowerCase() === "trainings")) {
+    page = await pageService.getPageByRoute(
+      routeName.toLowerCase() === "training" ? "trainings" : "training"
+    );
+  }
 
   if (!page) {
     notFound();
@@ -35,9 +42,11 @@ async function DynamicPageContent({ props }: { props: PageProps }) {
           projects={projects}
         />
       ) : routeName.toLowerCase() === "training" || routeName.toLowerCase() === "trainings" ? (
-        <div className="px-4 sm:px-6 max-w-7xl mx-auto lg:px-8 py-16">
-          <Training heading={page.heading} subheading={page.subheading} />
-        </div>
+        <Training
+          heading={page.heading}
+          subheading={page.subheading}
+          gallery={page.gallery}
+        />
       ) : (
         <div className="px-4 sm:px-6 max-w-7xl mx-auto lg:px-8 py-16">
           {page.heading.includes("<") ? (

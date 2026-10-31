@@ -8,6 +8,7 @@ export interface PageData {
   subheading: string;
   routeName: string;
   videoUrl?: string | null;
+  gallery?: string[];
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -34,11 +35,19 @@ function isPageData(value: unknown): value is PageData {
     typeof value.routeName === "string" &&
     (value.videoUrl === undefined ||
       value.videoUrl === null ||
-      typeof value.videoUrl === "string")
+      typeof value.videoUrl === "string") &&
+    (value.gallery === undefined ||
+      value.gallery === null ||
+      Array.isArray(value.gallery))
   );
 }
 
 function normalizePage(page: PageData): PageData {
+  const rawGallery = Array.isArray(page.gallery) ? page.gallery : [];
+  const gallery = rawGallery
+    .filter((url): url is string => typeof url === "string" && url.trim().length > 0)
+    .map((url) => resolveMediaUrl(url.trim()));
+
   return {
     ...page,
     heading: formatHeadingHtml(page.heading),
@@ -46,6 +55,7 @@ function normalizePage(page: PageData): PageData {
       typeof page.videoUrl === "string" && page.videoUrl.trim()
         ? resolveMediaUrl(page.videoUrl.trim())
         : null,
+    gallery,
   };
 }
 
