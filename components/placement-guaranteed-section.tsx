@@ -27,10 +27,49 @@ interface CardTheme {
 }
 
 const CARD_THEMES: CardTheme[] = [
-  // 0: Crisp White / Neutral Card (Image 1)
+  // 0: Royal Blue Theme (Brand Primary)
   {
     containerClass:
-      "bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800 text-neutral-900 dark:text-white shadow-[0_-10px_35px_rgba(0,0,0,0.16)]",
+      "bg-[#1550A5] text-white shadow-2xl",
+    titleColor: "text-white",
+    descriptionColor: "text-blue-100/90",
+    pillClass: "bg-white/15 backdrop-blur-xs text-white border border-white/20",
+    priceClass: "text-white",
+    strikethroughClass: "text-blue-200/75",
+    buttonClass:
+      "bg-white hover:bg-neutral-100 text-[#1550A5] font-bold shadow-md hover:shadow-lg focus-visible:ring-white",
+    badgeClass: "bg-white/20 text-white border-white/30",
+  },
+  // 1: Brand Orange Theme (Brand Accent)
+  {
+    containerClass:
+      "bg-[#F58216] text-white shadow-2xl",
+    titleColor: "text-white",
+    descriptionColor: "text-white/90",
+    pillClass: "bg-white/15 backdrop-blur-xs text-white border border-white/20",
+    priceClass: "text-white",
+    strikethroughClass: "text-white/75",
+    buttonClass:
+      "bg-white hover:bg-neutral-100 text-[#F58216] font-bold shadow-md hover:shadow-lg focus-visible:ring-white",
+    badgeClass: "bg-white/20 text-white border-white/30",
+  },
+  // 2: Obsidian Pitch Black Card
+  {
+    containerClass:
+      "bg-[#0B0C10] text-white border border-neutral-800 shadow-2xl",
+    titleColor: "text-white",
+    descriptionColor: "text-neutral-300",
+    pillClass: "bg-neutral-900 text-neutral-200 border border-neutral-800",
+    priceClass: "text-white",
+    strikethroughClass: "text-neutral-500",
+    buttonClass:
+      "bg-[#F58216] hover:bg-[#DE5426] text-white font-bold shadow-lg hover:shadow-xl focus-visible:ring-[#F58216]",
+    badgeClass: "bg-emerald-950/60 text-emerald-400 border-emerald-800/80",
+  },
+  // 3: Crisp Neutral Theme
+  {
+    containerClass:
+      "bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800 text-neutral-900 dark:text-white shadow-2xl",
     titleColor: "text-neutral-900 dark:text-white",
     descriptionColor: "text-neutral-600 dark:text-neutral-300",
     pillClass:
@@ -41,47 +80,6 @@ const CARD_THEMES: CardTheme[] = [
       "bg-[#1550A5] hover:bg-[#0f3a7a] text-white shadow-md hover:shadow-lg focus-visible:ring-[#1550A5]",
     badgeClass:
       "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60",
-  },
-  // 1: Brand Orange Card
-  {
-    containerClass:
-      "bg-[#F58216] text-white border-0 ring-1 ring-white/20 shadow-[0_-12px_40px_rgba(245,130,22,0.35)]",
-    titleColor: "text-white",
-    descriptionColor: "text-white/90",
-    pillClass:
-      "bg-white/15 backdrop-blur-xs text-white border border-white/25",
-    priceClass: "text-white",
-    strikethroughClass: "text-white/70",
-    buttonClass:
-      "bg-white hover:bg-neutral-100 text-[#F58216] font-bold shadow-lg hover:shadow-xl focus-visible:ring-white",
-    badgeClass: "bg-white/20 text-white border-white/30 backdrop-blur-xs",
-  },
-  // 2: Obsidian Pitch Black Card (Image 2)
-  {
-    containerClass:
-      "bg-[#0B0C10] text-white border border-neutral-800 shadow-[0_-12px_40px_rgba(0,0,0,0.6)]",
-    titleColor: "text-white",
-    descriptionColor: "text-neutral-300",
-    pillClass: "bg-neutral-900 text-neutral-200 border border-neutral-800",
-    priceClass: "text-white",
-    strikethroughClass: "text-neutral-500",
-    buttonClass:
-      "bg-[#F58216] hover:bg-[#DE5426] text-white font-bold shadow-lg hover:shadow-xl focus-visible:ring-[#F58216]",
-    badgeClass: "bg-emerald-950/60 text-emerald-400 border-emerald-800/80",
-  },
-  // 3: Royal Blue Theme (Brand Secondary)
-  {
-    containerClass:
-      "bg-[#1550A5] text-white border-0 ring-1 ring-white/20 shadow-[0_-12px_40px_rgba(21,80,165,0.35)]",
-    titleColor: "text-white",
-    descriptionColor: "text-blue-50/90",
-    pillClass:
-      "bg-white/15 backdrop-blur-xs text-white border border-white/25",
-    priceClass: "text-white",
-    strikethroughClass: "text-blue-200/70",
-    buttonClass:
-      "bg-white hover:bg-neutral-100 text-[#1550A5] font-bold shadow-lg hover:shadow-xl focus-visible:ring-white",
-    badgeClass: "bg-white/20 text-white border-white/30 backdrop-blur-xs",
   },
 ];
 
@@ -109,7 +107,6 @@ export default function PlacementGuaranteedSection({
       <div className="relative mx-auto w-[95%] px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-7xl mx-auto mb-12 sm:mb-16">
-
           <h2
             id="placement-section-heading"
             className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl text-neutral-900 dark:text-white"
@@ -134,12 +131,19 @@ export default function PlacementGuaranteedSection({
           </div>
         </div>
 
-        {/* Stacking Cards Container */}
-        <div className="relative w-full mx-auto space-y-12 sm:space-y-16 pb-24 sm:pb-36">
+        {/* Cards Container: Stacking on mobile (<md), Side-by-Side 50/50 Row on desktop (>=md) */}
+        <div className="relative w-full mx-auto md:flex md:flex-row md:items-stretch md:gap-0 md:sticky md:top-[112px] space-y-12 sm:space-y-16 md:space-y-0 pb-20 md:pb-28">
           {courses.map((course, index) => {
             const theme = CARD_THEMES[index % CARD_THEMES.length];
-            const isReversed = index % 2 === 1; // Alternating layout
             const courseHref = `/courses/${course.id}`;
+            const isFirst = index === 0;
+            const isLast = index === courses.length - 1;
+            const cornerClass =
+              isFirst && !isLast
+                ? "rounded-2xl md:rounded-r-none md:rounded-l-2xl"
+                : isLast && !isFirst
+                ? "rounded-2xl md:rounded-l-none md:rounded-r-2xl"
+                : "rounded-2xl";
 
             const durationDisplay = course.duration
               ? course.duration.toLowerCase().includes("month")
@@ -150,41 +154,42 @@ export default function PlacementGuaranteedSection({
             return (
               <div
                 key={course.id}
-                className="sticky transition-all duration-300 ease-out"
+                className="sticky md:static w-full md:w-1/2 md:flex-1 flex flex-col transition-all duration-300 ease-out"
                 style={{
-                  top: `calc(100px + ${index * 24}px)`,
+                  top: `calc(108px + ${index * 20}px)`,
                   zIndex: 10 + index,
                 }}
               >
                 <article
-                  className={`relative rounded-xl overflow-hidden p-4 sm:p-6 lg:p-8 transition-transform duration-200 ${theme.containerClass}`}
+                  className={`relative h-full flex flex-col justify-between overflow-hidden transition-transform duration-200 ${cornerClass} ${theme.containerClass}`}
                 >
-                  <div
-                    className={`grid grid-cols-1 lg:grid-cols-12 gap-8 ${isReversed ? "lg:[&>*:first-child]:order-2" : ""
-                      }`}
-                  >
-                    {/* Media Column */}
-                    <div className="lg:col-span-4 xl:col-span-4 w-full flex justify-center items-start">
-                      <div className="relative w-full rounded-2xl overflow-hidden shadow-xl bg-neutral-900 group">
-                        <Link href={courseHref} className="block w-full" tabIndex={-1} aria-hidden="true">
+                  <div className="flex flex-col h-full justify-between space-y-5">
+                    {/* Media / Thumbnail */}
+                    <div className="w-full">
+                      <div className="relative w-full aspect-video overflow-hidden shadow-lg bg-neutral-900 group">
+                        <Link
+                          href={courseHref}
+                          className="block w-full h-full"
+                          tabIndex={-1}
+                          aria-hidden="true"
+                        >
                           <Image
                             src={course.courseImgUrl}
                             alt={course.name}
                             width={800}
                             height={450}
-                            sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 340px, 360px"
-                            className="w-full h-auto block transition-transform duration-500 group-hover:scale-105"
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            className="w-full h-full object-cover block transition-transform duration-500 group-hover:scale-105"
                           />
                         </Link>
                       </div>
                     </div>
 
-                    {/* Content Column */}
-                    <div className="lg:col-span-8 xl:col-span-8 flex flex-col space-y-5">
-
+                    {/* Content */}
+                    <div className="flex flex-col flex-1 justify-between space-y-4 p-4">
                       {/* Title */}
                       <h3
-                        className={`text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight leading-snug ${theme.titleColor}`}
+                        className={`text-lg sm:text-xl lg:text-2xl font-extrabold tracking-tight leading-snug flex items-center ${theme.titleColor}`}
                       >
                         <Link
                           href={courseHref}
@@ -197,81 +202,73 @@ export default function PlacementGuaranteedSection({
                       {/* Description */}
                       {(course.shortDescription || course.longDescription) && (
                         <p
-                          className={`text-xs sm:text-sm lg:text-base leading-relaxed line-clamp-2 sm:line-clamp-3 ${theme.descriptionColor}`}
+                          className={`text-xs sm:text-sm lg:text-base leading-relaxed line-clamp-2 ${theme.descriptionColor}`}
                         >
                           {course.shortDescription || course.longDescription}
                         </p>
                       )}
 
                       {/* 3 Key Stats / Feature Badges */}
-                      <div className="grid grid-cols-3 gap-2 sm:gap-3 py-1">
-                        {durationDisplay ? (
-                          <div
-                            className={`flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs sm:text-sm font-medium ${theme.pillClass}`}
-                          >
-                            <Clock className="size-4 shrink-0 opacity-80" />
-                            <div className="min-w-0">
-                              <p className="font-bold truncate">{durationDisplay}</p>
-                              <p className="text-[10px] opacity-70 truncate hidden sm:block">
-                                Curriculum
-                              </p>
-                            </div>
+                      <div className="grid grid-cols-3 gap-2 py-1">
+                        <div
+                          className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-2 rounded-xl text-xs font-medium ${theme.pillClass}`}
+                        >
+                          <Clock className="size-3.5 sm:size-4 shrink-0 opacity-80" />
+                          <div className="min-w-0">
+                            <p className="font-bold truncate text-[11px] sm:text-xs">
+                              {durationDisplay || "Comprehensive"}
+                            </p>
+                            <p className="text-[10px] opacity-75 truncate hidden sm:block">
+                              Curriculum
+                            </p>
                           </div>
-                        ) : (
-                          <div
-                            className={`flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs sm:text-sm font-medium ${theme.pillClass}`}
-                          >
-                            <Clock className="size-4 shrink-0 opacity-80" />
-                            <div className="min-w-0">
-                              <p className="font-bold truncate">Comprehensive</p>
-                              <p className="text-[10px] opacity-70 truncate hidden sm:block">
-                                Curriculum
-                              </p>
-                            </div>
-                          </div>
-                        )}
+                        </div>
 
                         <div
-                          className={`flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs sm:text-sm font-medium ${theme.pillClass}`}
+                          className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-2 rounded-xl text-xs font-medium ${theme.pillClass}`}
                         >
-                          <ShieldCheck className="size-4 shrink-0 opacity-80" />
+                          <ShieldCheck className="size-3.5 sm:size-4 shrink-0 opacity-80" />
                           <div className="min-w-0">
-                            <p className="font-bold truncate">Certified</p>
-                            <p className="text-[10px] opacity-70 truncate hidden sm:block">
+                            <p className="font-bold truncate text-[11px] sm:text-xs">
+                              Certified
+                            </p>
+                            <p className="text-[10px] opacity-75 truncate hidden sm:block">
                               Job Guarantee
                             </p>
                           </div>
                         </div>
 
                         <div
-                          className={`flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs sm:text-sm font-medium ${theme.pillClass}`}
+                          className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-2 rounded-xl text-xs font-medium ${theme.pillClass}`}
                         >
-                          <Headphones className="size-4 shrink-0 opacity-80" />
+                          <Headphones className="size-3.5 sm:size-4 shrink-0 opacity-80" />
                           <div className="min-w-0">
-                            <p className="font-bold truncate">24/7</p>
-                            <p className="text-[10px] opacity-70 truncate hidden sm:block">
+                            <p className="font-bold truncate text-[11px] sm:text-xs">
+                              24/7
+                            </p>
+                            <p className="text-[10px] opacity-75 truncate hidden sm:block">
                               Mentor Support
                             </p>
                           </div>
                         </div>
                       </div>
 
-                      {/* Price & Action Button (Matching Image 2) */}
-                      <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-current/10">
-                        <div className="hidden  md:flex items-baseline gap-2">
-                          <span className="text-xs font-medium uppercase tracking-wider opacity-70">
+                      {/* Price & Action Button */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-white/20 mt-auto">
+                        <div className="hidden md:flex items-baseline gap-1.5 sm:gap-2">
+                          <span className="text-[11px] font-medium uppercase tracking-wider opacity-80">
                             Price
                           </span>
                           <span
-                            className={`text-xl sm:text-2xl lg:text-3xl font-extrabold ${theme.priceClass}`}
+                            className={`text-lg sm:text-xl lg:text-2xl font-extrabold ${theme.priceClass}`}
                           >
                             {formatPriceINR(course.discountedPrice)}
                           </span>
                           {course.originalPrice > course.discountedPrice && (
                             <span
-                              className={`text-xs sm:text-sm line-through ${theme.strikethroughClass}`}
+                              className={`text-xs line-through ${theme.strikethroughClass}`}
                             >
-                              {formatPriceINR(course.originalPrice)} (+GST)
+                              {formatPriceINR(course.originalPrice)}
                             </span>
                           )}
                         </div>
@@ -279,7 +276,7 @@ export default function PlacementGuaranteedSection({
                         <div className="flex items-center gap-2">
                           <Link
                             href={courseHref}
-                            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] ${theme.buttonClass}`}
+                            className={`inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] ${theme.buttonClass}`}
                           >
                             <span>Explore Program</span>
                             <ArrowRight className="size-4" />

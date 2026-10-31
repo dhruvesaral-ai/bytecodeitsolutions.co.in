@@ -18,7 +18,6 @@ import AnimatedBanner from "@/components/animated-banner";
 import ScrollToTop from "@/components/scroll-to-top";
 async function HeaderSlot() {
   const pages = await pageService.getPages();
-  console.log("Pages :", pages);
   return <Header initialPages={pages} />;
 }
 
@@ -142,18 +141,18 @@ export default async function RootLayout({
               <EnquiryProvider>
                 <SidebarProvider>
                   <div id="main-sticky-header" className="sticky top-0 z-40 w-full">
-                  <AnimatedBanner />
-                  <Suspense
-                    fallback={
-                      <div
-                        className="h-16 w-full border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black"
-                        aria-busy="true"
-                      />
-                    }
-                  >
-                    <HeaderSlot />
-                  </Suspense>
-                </div>
+                    <AnimatedBanner />
+                    <Suspense
+                      fallback={
+                        <div
+                          className="h-16 w-full border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black"
+                          aria-busy="true"
+                        />
+                      }
+                    >
+                      <HeaderSlot />
+                    </Suspense>
+                  </div>
                 <SmoothScroll>{children}</SmoothScroll>
                 <Suspense fallback={null}>
                   <Footer />
