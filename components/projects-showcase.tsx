@@ -13,12 +13,6 @@ export default function ProjectsShowcase({ projects }: ProjectsShowcaseProps) {
 
   return (
     <section aria-labelledby="projects-heading" className="mt-16">
-      <h2
-        id="projects-heading"
-        className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-3xl"
-      >
-        Our Projects
-      </h2>
 
       <ul className="mt-8 space-y-12 sm:mt-10 sm:space-y-16">
         {projects.map((project, index) => {

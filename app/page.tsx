@@ -37,7 +37,7 @@ async function HomeHero() {
           />
           {/* Light contrast overlay so video is sharp, vibrant, and clearly visible */}
           <div
-            className="pointer-events-none absolute inset-0 bg-black/25 dark:bg-black/35"
+            className="pointer-events-none absolute inset-0 bg-black/35 dark:bg-black/70"
             aria-hidden="true"
           />
           {/* Subtle edge fade to blend naturally into adjacent content */}

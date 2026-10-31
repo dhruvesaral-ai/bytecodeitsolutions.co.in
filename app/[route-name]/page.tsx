@@ -26,17 +26,20 @@ async function DynamicPageContent({ props }: { props: PageProps }) {
       : [];
 
   return (
-    <main className="px-4 sm:px-6 lg:px-8 py-16">
+    <main className="w-full flex-1">
       {routeName.toLowerCase() === "development" ? (
         <Development
           heading={page.heading}
           subheading={page.subheading}
+          videoUrl={page.videoUrl}
           projects={projects}
         />
       ) : routeName.toLowerCase() === "training" || routeName.toLowerCase() === "trainings" ? (
-        <Training heading={page.heading} subheading={page.subheading} />
+        <div className="px-4 sm:px-6 max-w-7xl mx-auto lg:px-8 py-16">
+          <Training heading={page.heading} subheading={page.subheading} />
+        </div>
       ) : (
-        <>
+        <div className="px-4 sm:px-6 max-w-7xl mx-auto lg:px-8 py-16">
           {page.heading.includes("<") ? (
             <h1
               className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-4xl"
@@ -50,7 +53,7 @@ async function DynamicPageContent({ props }: { props: PageProps }) {
           <p className="mt-4 max-w-3xl text-base leading-relaxed text-neutral-600 dark:text-neutral-400 sm:text-lg">
             {page.subheading}
           </p>
-        </>
+        </div>
       )}
     </main>
   );

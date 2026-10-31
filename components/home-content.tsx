@@ -27,11 +27,21 @@ export default async function HomeContent() {
       course.status === "active"
   );
 
-  const categories = categoriesData.filter(
-    (category) =>
-      category.slug !== "bootcamp-courses" &&
-      category.slug !== "100%-placement-opportunity-guaranteed-courses"
-  );
+  const getCategoryRank = (category: { slug: string; name: string }) => {
+    const slug = category.slug.toLowerCase();
+    const name = category.name.toLowerCase();
+    if (slug.includes("job-ready") || name.includes("job ready")) return 1;
+    if (slug.includes("beginner") || name.includes("beginner")) return 2;
+    return 3;
+  };
+
+  const categories = categoriesData
+    .filter(
+      (category) =>
+        category.slug !== "bootcamp-courses" &&
+        category.slug !== "100%-placement-opportunity-guaranteed-courses"
+    )
+    .sort((a, b) => getCategoryRank(a) - getCategoryRank(b));
 
   const homepageCarousel = carousals.find(
     (carousel) => carousel.position === "homepage"

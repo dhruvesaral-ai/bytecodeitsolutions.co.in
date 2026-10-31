@@ -102,7 +102,7 @@ export default function PlacementGuaranteedSection({
     <section
       id="placement-guaranteed-courses"
       aria-labelledby="placement-section-heading"
-      className="relative w-full py-16 sm:py-24 border-y transition-colors duration-300 bg-[#FAF4EE] text-neutral-900 border-amber-900/10 dark:bg-[#0C0D14] dark:text-white dark:border-neutral-800/80 rounded-tl-[50px] rounded-tr-[50px] overflow-visible"
+      className="relative w-full py-8 sm:py-16 border-y transition-colors duration-300 bg-[#FAF4EE] text-neutral-900 border-amber-900/10 dark:bg-[#0C0D14] dark:text-white dark:border-neutral-800/80 rounded-tl-[50px] rounded-tr-[50px] overflow-visible"
     >
       <div className="relative mx-auto w-[95%] px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
@@ -111,7 +111,7 @@ export default function PlacementGuaranteedSection({
             id="placement-section-heading"
             className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl text-neutral-900 dark:text-white"
           >
-            Wanted to get a <strong>Job</strong>?<br></br>
+            Wanted to get a <strong className="text-orange-400">Job</strong>?<br></br>
             <span className="block">We&apos;re Here To Help.</span>
           </h2>
 
@@ -132,7 +132,7 @@ export default function PlacementGuaranteedSection({
         </div>
 
         {/* Cards Container: Stacking on mobile (<md), Side-by-Side 50/50 Row on desktop (>=md) */}
-        <div className="relative w-full mx-auto md:flex md:flex-row md:items-stretch md:gap-0 md:sticky md:top-[112px] space-y-12 sm:space-y-16 md:space-y-0 pb-20 md:pb-28">
+        <div className="relative w-full mx-auto md:flex md:flex-row md:items-stretch md:gap-0 md:sticky md:top-[112px] space-y-12 sm:space-y-16 md:space-y-0 ">
           {courses.map((course, index) => {
             const theme = CARD_THEMES[index % CARD_THEMES.length];
             const courseHref = `/courses/${course.id}`;
