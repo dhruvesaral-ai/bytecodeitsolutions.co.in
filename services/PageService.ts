@@ -1,4 +1,5 @@
-import { ApiRequestError, get } from "@/lib/api-method";
+import { MEDIA_BASE_URL } from "@/config";
+import { get } from "@/lib/api-method";
 import { formatHeadingHtml } from "@/lib/format-heading";
 
 export interface PageData {
@@ -6,10 +7,22 @@ export interface PageData {
   heading: string;
   subheading: string;
   routeName: string;
+  videoUrl?: string | null;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
+}
+
+function resolveMediaUrl(url: string): string {
+  try {
+    const base = MEDIA_BASE_URL.includes("localhost:3001")
+      ? "https://admin.bytecode.co.in"
+      : MEDIA_BASE_URL;
+    return new URL(url, `${base.replace(/\/+$/, "")}/`).toString();
+  } catch {
+    return url;
+  }
 }
 
 function isPageData(value: unknown): value is PageData {
@@ -18,7 +31,10 @@ function isPageData(value: unknown): value is PageData {
     typeof value.id === "string" &&
     typeof value.heading === "string" &&
     typeof value.subheading === "string" &&
-    typeof value.routeName === "string"
+    typeof value.routeName === "string" &&
+    (value.videoUrl === undefined ||
+      value.videoUrl === null ||
+      typeof value.videoUrl === "string")
   );
 }
 
@@ -26,6 +42,10 @@ function normalizePage(page: PageData): PageData {
   return {
     ...page,
     heading: formatHeadingHtml(page.heading),
+    videoUrl:
+      typeof page.videoUrl === "string" && page.videoUrl.trim()
+        ? resolveMediaUrl(page.videoUrl.trim())
+        : null,
   };
 }
 

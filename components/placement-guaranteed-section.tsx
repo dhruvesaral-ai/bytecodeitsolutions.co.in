@@ -152,7 +152,7 @@ export default function PlacementGuaranteedSection({
                 key={course.id}
                 className="sticky transition-all duration-300 ease-out"
                 style={{
-                  top: `calc(80px + ${index * 24}px)`,
+                  top: `calc(100px + ${index * 24}px)`,
                   zIndex: 10 + index,
                 }}
               >
