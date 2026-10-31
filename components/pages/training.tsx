@@ -33,13 +33,8 @@ export default function Training({ heading, subheading, gallery = [] }: Training
   return (
     <div className="w-full flex-1">
       {/* Hero Section */}
-      <section className="relative overflow-hidden w-full text-center pt-16 sm:pt-20 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 border-b border-neutral-200/80 dark:border-neutral-800/80 bg-neutral-50/50 dark:bg-neutral-950/50">
+      <section className="relative overflow-hidden w-full text-center pt-16 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 border-b border-neutral-200/80 dark:border-neutral-800/80 bg-neutral-50/50 dark:bg-neutral-950/50">
         <div className="max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F58216]/10 border border-[#F58216]/25 text-[#F58216] text-xs font-bold uppercase tracking-wider mb-4">
-            <Sparkles className="size-3.5" />
-            <span>Campus & Technical Trainings</span>
-          </div>
-
           {heading && (
             heading.includes("<") ? (
               <h1
@@ -84,17 +79,6 @@ export default function Training({ heading, subheading, gallery = [] }: Training
       {/* Gallery Section */}
       <section className="w-full py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 text-center max-w-3xl mx-auto">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#1550A5] dark:text-blue-400 mb-2">
-              Visual Highlights
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
-              Campus Drives & Workshop Moments
-            </h2>
-            <p className="mt-3 text-sm sm:text-base text-neutral-600 dark:text-neutral-300">
-              Photographs from our live classroom sessions, coding bootcamps, and technical seminars across universities.
-            </p>
-          </div>
 
           {gallery && gallery.length > 0 ? (
             <TrainingGallery images={gallery} />
