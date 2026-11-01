@@ -12,10 +12,12 @@ import SmoothScroll from "@/components/smooth-scroll";
 import Header from "@/components/header";
 import { pageService } from "@/services/PageService";
 import { getCachedSettings } from "@/lib/cached-settings";
+import { SITE_URL } from "@/config";
 import "./globals.css";
 import Footer from "@/components/footer";
 import AnimatedBanner from "@/components/animated-banner";
 import ScrollToTop from "@/components/scroll-to-top";
+
 async function HeaderSlot() {
   const pages = await pageService.getPages();
   return <Header initialPages={pages} />;
@@ -71,6 +73,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Bytecode IT Solutions",
   description: "Innovative software solutions, training, and programs.",
   icons: {

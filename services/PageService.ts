@@ -9,6 +9,10 @@ export interface PageData {
   routeName: string;
   videoUrl?: string | null;
   gallery?: string[];
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  content?: string | null;
+  updatedAt?: string | null;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -38,7 +42,19 @@ function isPageData(value: unknown): value is PageData {
       typeof value.videoUrl === "string") &&
     (value.gallery === undefined ||
       value.gallery === null ||
-      Array.isArray(value.gallery))
+      Array.isArray(value.gallery)) &&
+    (value.metaTitle === undefined ||
+      value.metaTitle === null ||
+      typeof value.metaTitle === "string") &&
+    (value.metaDescription === undefined ||
+      value.metaDescription === null ||
+      typeof value.metaDescription === "string") &&
+    (value.content === undefined ||
+      value.content === null ||
+      typeof value.content === "string") &&
+    (value.updatedAt === undefined ||
+      value.updatedAt === null ||
+      typeof value.updatedAt === "string")
   );
 }
 
@@ -56,6 +72,22 @@ function normalizePage(page: PageData): PageData {
         ? resolveMediaUrl(page.videoUrl.trim())
         : null,
     gallery,
+    metaTitle:
+      typeof page.metaTitle === "string" && page.metaTitle.trim().length > 0
+        ? page.metaTitle.trim()
+        : null,
+    metaDescription:
+      typeof page.metaDescription === "string" && page.metaDescription.trim().length > 0
+        ? page.metaDescription.trim()
+        : null,
+    content:
+      typeof page.content === "string" && page.content.trim().length > 0
+        ? page.content.trim()
+        : null,
+    updatedAt:
+      typeof page.updatedAt === "string" && page.updatedAt.trim().length > 0
+        ? page.updatedAt.trim()
+        : null,
   };
 }
 

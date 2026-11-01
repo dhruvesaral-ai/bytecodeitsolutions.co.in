@@ -3,15 +3,41 @@ import type { Metadata } from "next";
 import EnquireNow from "@/components/enquire-now";
 import CoursesExplorer from "@/components/courses-explorer";
 import CourseAdvisoryCard from "@/components/course-advisory-card";
+import CustomPageContent from "@/components/custom-page-content";
 import { courseService } from "@/services/CourseService";
 import { pageService } from "@/services/PageService";
 import { formatHeadingHtml } from "@/lib/format-heading";
 
-export const metadata: Metadata = {
-  title: "AI-Powered Modern Tech Courses with Real MNC Developers | Bytecode IT Solutions",
-  description:
-    "Master Full Stack Development, Generative AI, Mobile Apps, and Cloud DevOps. Learn directly from engineers at top MNCs with hands-on production projects and placement support.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const pageData = await pageService.getPageByRoute("courses");
+
+  const fallbackTitle =
+    "AI-Powered Modern Tech Courses with Real MNC Developers | Bytecode IT Solutions";
+  const fallbackDesc =
+    "Master Full Stack Development, Generative AI, Mobile Apps, and Cloud DevOps. Learn directly from engineers at top MNCs with hands-on production projects and placement support.";
+
+  const cleanHeading = pageData?.heading ? pageData.heading.replace(/<[^>]*>/g, "").trim() : "";
+  const title =
+    pageData?.metaTitle?.trim() ||
+    (cleanHeading ? `${cleanHeading} | Bytecode IT Solutions` : fallbackTitle);
+  const description =
+    pageData?.metaDescription?.trim() ||
+    pageData?.subheading?.trim() ||
+    fallbackDesc;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+    },
+    twitter: {
+      title,
+      description,
+    },
+  };
+}
 
 async function CoursesContent() {
   const [courses, categories] = await Promise.all([
@@ -62,6 +88,17 @@ async function CoursesHero() {
   );
 }
 
+async function CoursesCustomSection() {
+  const pageData = await pageService.getPageByRoute("courses");
+  if (!pageData?.content) return null;
+
+  return (
+    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <CustomPageContent content={pageData.content} />
+    </section>
+  );
+}
+
 function CoursesHeroSkeleton() {
   return (
     <section className="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-950/40 py-5 sm:py-10">
@@ -97,6 +134,11 @@ export default function CoursesPage() {
             <CoursesContent />
           </Suspense>
         </section>
+
+        {/* Custom HTML/CSS/JS Content if configured */}
+        <Suspense fallback={null}>
+          <CoursesCustomSection />
+        </Suspense>
       </main>
 
       <EnquireNow />

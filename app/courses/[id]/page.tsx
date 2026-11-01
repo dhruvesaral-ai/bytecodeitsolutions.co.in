@@ -149,6 +149,7 @@ export default function CoursePage({
         <CourseDetails params={params} />
       </Suspense>
       <EnquireNow />
+      <button className="sticky bottom-0 left-0 w-full border bg-[#1550A5] text-white border-none cursor-pointer  px-4 py-2.5">Pay Now</button>
     </div>
   );
 }

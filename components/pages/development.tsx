@@ -1,6 +1,7 @@
 import { formatHeadingHtml } from "@/lib/format-heading";
 import ProjectsShowcase from "@/components/projects-showcase";
 import DevelopmentProcess from "@/components/development-process";
+import CustomPageContent from "@/components/custom-page-content";
 import type { Project } from "@/services/ProjectService";
 
 interface DevelopmentProps {
@@ -8,6 +9,7 @@ interface DevelopmentProps {
   subheading: string;
   videoUrl?: string | null;
   projects: Project[];
+  content?: string | null;
 }
 
 export default function Development({
@@ -15,6 +17,7 @@ export default function Development({
   subheading,
   videoUrl,
   projects,
+  content,
 }: DevelopmentProps) {
   const hasVideo = Boolean(videoUrl);
 
@@ -102,7 +105,16 @@ export default function Development({
         </div>
         <ProjectsShowcase projects={projects} />
       </section>
+
+      {/* Step-by-Step Project Approach */}
       <DevelopmentProcess />
+
+      {/* Custom HTML/CSS/JS Content if provided by admin */}
+      {content && (
+        <section className="w-full py-8">
+          <CustomPageContent content={content} />
+        </section>
+      )}
     </div>
   );
 }

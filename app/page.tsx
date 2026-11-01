@@ -1,9 +1,34 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import PlacedStudents from "@/components/placed-students";
 import HomeContent from "@/components/home-content";
 import EnquireNow from "@/components/enquire-now";
+import CustomPageContent from "@/components/custom-page-content";
 import { pageService } from "@/services/PageService";
 import { formatHeadingHtml } from "@/lib/format-heading";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await pageService.getPageByRoute("home");
+
+  const cleanHeading = page?.heading ? page.heading.replace(/<[^>]*>/g, "").trim() : "";
+  const title =
+    page?.metaTitle?.trim() ||
+    (cleanHeading ? `${cleanHeading} | Bytecode IT Solutions` : "Bytecode IT Solutions");
+  const description = page?.metaDescription?.trim() || page?.subheading?.trim() || undefined;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+    },
+    twitter: {
+      title,
+      description,
+    },
+  };
+}
 
 async function HomeHero() {
   const page = await pageService.getPageByRoute("home");
@@ -83,6 +108,17 @@ async function HomeHero() {
   );
 }
 
+async function HomeCustomSection() {
+  const page = await pageService.getPageByRoute("home");
+  if (!page?.content) return null;
+
+  return (
+    <section className="w-full">
+      <CustomPageContent content={page.content} />
+    </section>
+  );
+}
+
 export default function Home() {
   return (
     <div className="flex-1 flex flex-col">
@@ -93,6 +129,11 @@ export default function Home() {
 
         <Suspense fallback={<div className="min-h-[60vh]" aria-busy="true" />}>
           <HomeContent />
+        </Suspense>
+
+        {/* Custom HTML/CSS/JS Content if configured */}
+        <Suspense fallback={null}>
+          <HomeCustomSection />
         </Suspense>
 
         {/* Placed Students Animated Section */}

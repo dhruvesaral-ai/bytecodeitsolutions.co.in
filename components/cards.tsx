@@ -50,11 +50,6 @@ export default function CourseCard({ course }: CourseCardProps) {
                 Sale
               </span>
             )}
-            {course.isPlacementGurranted && (
-              <span className="rounded bg-emerald-600 px-2 py-0.5 text-[11px] font-medium text-white tracking-wide">
-                Placement Assured
-              </span>
-            )}
           </div>
 
           <div className="flex items-center gap-1 rounded bg-black/75 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur-none">

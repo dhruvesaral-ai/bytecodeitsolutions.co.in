@@ -25,6 +25,8 @@ export interface Course {
   syllabus: string | null;
   isPlacementGurranted: boolean;
   courseCategorie: CourseCategory | null;
+  updatedAt?: string;
+  createdAt?: string;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -101,6 +103,8 @@ function parseCourse(value: unknown, index: number): Course {
     courseCategorie: isCourseCategory(value.courseCategorie)
       ? value.courseCategorie
       : null,
+    updatedAt: typeof value.updatedAt === "string" ? value.updatedAt : undefined,
+    createdAt: typeof value.createdAt === "string" ? value.createdAt : undefined,
   };
 }
 
@@ -167,4 +171,3 @@ export default class CourseService {
 }
 
 export const courseService = new CourseService();
-

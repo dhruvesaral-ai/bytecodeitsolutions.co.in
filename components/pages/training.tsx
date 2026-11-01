@@ -3,6 +3,7 @@
 import React from "react";
 import { formatHeadingHtml } from "@/lib/format-heading";
 import TrainingGallery from "@/components/training-gallery";
+import CustomPageContent from "@/components/custom-page-content";
 import { useEnquiry } from "@/context/enquiry-context";
 import {
   GraduationCap,
@@ -11,16 +12,21 @@ import {
   Layers,
   ArrowRight,
   Camera,
-  Sparkles,
 } from "lucide-react";
 
 interface TrainingProps {
   heading: string;
   subheading: string;
   gallery?: string[];
+  content?: string | null;
 }
 
-export default function Training({ heading, subheading, gallery = [] }: TrainingProps) {
+export default function Training({
+  heading,
+  subheading,
+  gallery = [],
+  content,
+}: TrainingProps) {
   const { openEnquiry } = useEnquiry();
 
   const stats = [
@@ -79,7 +85,6 @@ export default function Training({ heading, subheading, gallery = [] }: Training
       {/* Gallery Section */}
       <section className="w-full py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
           {gallery && gallery.length > 0 ? (
             <TrainingGallery images={gallery} />
           ) : (
@@ -128,6 +133,13 @@ export default function Training({ heading, subheading, gallery = [] }: Training
           </div>
         </div>
       </section>
+
+      {/* Custom HTML/CSS/JS Content if provided by admin */}
+      {content && (
+        <section className="w-full py-8">
+          <CustomPageContent content={content} />
+        </section>
+      )}
     </div>
   );
 }
