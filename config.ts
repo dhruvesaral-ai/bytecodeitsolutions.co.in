@@ -1,7 +1,7 @@
 const useLocalBackend = process.env.NEXT_PUBLIC_USE_LOCAL_BACKEND === "true";
 
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://bytecodeitsolutions.co.in";
+  process.env.NEXT_PUBLIC_SITE_URL || "https://bytecode.co.in";
 
 export const BACKEND_URL = useLocalBackend
   ? "http://localhost:3001/api/"
