@@ -30,7 +30,7 @@ const nextConfig: NextConfig = {
         port: "3001",
         pathname: "/**",
       },
-    ],
+    ], 
   },
   turbopack: {
     rules: {

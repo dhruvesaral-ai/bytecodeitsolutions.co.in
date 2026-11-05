@@ -1,9 +1,11 @@
-import { Suspense } from "react";
+import { cache, Suspense } from "react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import EnquireNow from "@/components/enquire-now";
 import { courseService } from "@/services/CourseService";
+
+const getCourseById = cache((id: string) => courseService.getCourseById(id));
 
 function formatCurrency(price: number): string {
   return new Intl.NumberFormat("en-IN", {
@@ -13,13 +15,55 @@ function formatCurrency(price: number): string {
   }).format(price);
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const course = await getCourseById(id);
+
+  if (!course) {
+    return {
+      title: "Course Not Found | Bytecode IT Solutions",
+      description:
+        "The requested course could not be found. Explore our wide range of tech courses and find the perfect fit for your learning journey.",
+    };
+  }
+
+  const title = `${course.name} | Bytecode IT Solutions`;
+  const description =
+    course.shortDescription ||
+    "Explore our tech courses and enhance your skills with hands-on projects and expert guidance.";
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [
+        {
+          url: course.courseImgUrl,
+          alt: course.name,
+        },
+      ],
+    },
+    twitter: {
+      title,
+      description,
+      images: [course.courseImgUrl],
+    },
+  };
+}
+
 async function CourseDetails({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const course = await courseService.getCourseById(id);
+  const course = await getCourseById(id);
   if (!course) {
     notFound();
   }
@@ -148,8 +192,14 @@ export default function CoursePage({
       >
         <CourseDetails params={params} />
       </Suspense>
-      <EnquireNow />
-      <button className="sticky bottom-0 left-0 w-full border bg-[#1550A5] text-white border-none cursor-pointer  px-4 py-2.5">Pay Now</button>
+      <div className="flex items-center bg-[#1550A5] justify-between gap-4 py-2 px-4 sticky bottom-0 z-10">
+        <button className="rounded-md bg-[#F58216] w-1/2 py-2.5 font-bold">
+          Book Demo
+        </button>
+        <button className="rounded-md bg-green-500 text-white w-1/2 py-2.5">
+          Request Callback
+        </button>
+      </div>
     </div>
   );
 }
