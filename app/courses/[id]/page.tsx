@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import CourseDetailActions from "@/components/course-detail-actions";
 import { courseService } from "@/services/CourseService";
 
 const getCourseById = cache((id: string) => courseService.getCourseById(id));
@@ -69,6 +70,7 @@ async function CourseDetails({
   }
 
   return (
+    <>
     <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
       <Link
         href="/"
@@ -124,6 +126,29 @@ async function CourseDetails({
               </ul>
             </section>
           )}
+
+          {course.modules.length > 0 && (
+            <section className="mt-8">
+              <h2 className="text-lg font-semibold text-neutral-900 dark:text-white">
+                Course modules
+              </h2>
+              <ol className="mt-3 space-y-3">
+                {course.modules.map((module, index) => (
+                  <li
+                    key={module.id}
+                    className="rounded-xl border border-neutral-200 p-4 dark:border-neutral-800"
+                  >
+                    <h3 className="font-medium text-neutral-900 dark:text-white">
+                      {index + 1}. {module.title}
+                    </h3>
+                    <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
+                      {module.description}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
         </div>
 
         <aside className="h-fit rounded-2xl border border-neutral-200 p-6 dark:border-neutral-800">
@@ -146,6 +171,16 @@ async function CourseDetails({
                 {course.duration}
               </dd>
             </div>
+            {course.bookingAmount !== null && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-neutral-500 dark:text-neutral-400">
+                  Booking amount
+                </dt>
+                <dd className="text-right font-medium text-neutral-900 dark:text-white">
+                  {formatCurrency(course.bookingAmount)}
+                </dd>
+              </div>
+            )}
             <div className="flex justify-between gap-4">
               <dt className="text-neutral-500 dark:text-neutral-400">Rating</dt>
               <dd className="text-right font-medium text-neutral-900 dark:text-white">
@@ -162,6 +197,43 @@ async function CourseDetails({
             </div>
           </dl>
 
+          {course.installmentPlans.some(
+            (plan) => plan.isActive && plan.installments.length > 0
+          ) && (
+            <section className="mt-6 border-t border-neutral-200 pt-6 dark:border-neutral-800">
+              <h2 className="text-sm font-semibold text-neutral-900 dark:text-white">
+                Installment plans
+              </h2>
+              <div className="mt-3 space-y-4">
+                {course.installmentPlans
+                  .filter((plan) => plan.isActive && plan.installments.length > 0)
+                  .map((plan, planIndex) => (
+                    <div key={plan.id}>
+                      <h3 className="text-sm font-medium text-neutral-700 dark:text-neutral-200">
+                        Plan {planIndex + 1}
+                      </h3>
+                      <ol className="mt-2 space-y-2">
+                        {plan.installments.map((installment) => (
+                          <li
+                            key={installment.id}
+                            className="flex justify-between gap-4 text-sm"
+                          >
+                            <span className="text-neutral-500 dark:text-neutral-400">
+                              Installment {installment.installmentNo} · Due after{" "}
+                              {installment.dueAfterDays} days
+                            </span>
+                            <span className="font-medium text-neutral-900 dark:text-white">
+                              {formatCurrency(installment.amount)}
+                            </span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  ))}
+              </div>
+            </section>
+          )}
+
           {course.syllabus && (
             <a
               href={course.syllabus}
@@ -175,6 +247,11 @@ async function CourseDetails({
         </aside>
       </article>
     </main>
+    <CourseDetailActions
+      bookingAmount={course.bookingAmount}
+      installmentPlans={course.installmentPlans}
+    />
+    </>
   );
 }
 
@@ -192,14 +269,6 @@ export default function CoursePage({
       >
         <CourseDetails params={params} />
       </Suspense>
-      <div className="flex items-center bg-[#1550A5] justify-between gap-4 py-2 px-4 sticky bottom-0 z-10">
-        <button className="rounded-md bg-[#F58216] w-1/2 py-2.5 font-bold">
-          Book Demo
-        </button>
-        <button className="rounded-md bg-green-500 text-white w-1/2 py-2.5">
-          Request Callback
-        </button>
-      </div>
     </div>
   );
 }
