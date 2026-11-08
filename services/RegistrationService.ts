@@ -1,5 +1,4 @@
-const BOOKING_ORDER_URL =
-  "https://admin.bytecodeitsolutions.co.in/api/registrations/booking/order";
+import { post } from "@/lib/api-method";
 
 export interface BookingOrder {
   keyId: string;
@@ -34,37 +33,16 @@ export async function createBookingOrder(
   courseId: string,
   accessToken: string | null
 ): Promise<BookingOrder> {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  const headers: Record<string, string> = {};
   if (accessToken) {
     headers.Authorization = `Bearer ${accessToken}`;
   }
 
-  const response = await fetch(BOOKING_ORDER_URL, {
-    method: "POST",
-    credentials: "include",
-    headers,
-    body: JSON.stringify({ courseId }),
-  });
-  const responseBody = await response.text();
-  let payload: unknown;
-
-  try {
-    payload = responseBody ? JSON.parse(responseBody) : null;
-  } catch {
-    throw new Error("The booking service returned an invalid response.");
-  }
-
-  if (!response.ok) {
-    const errorMessage =
-      isRecord(payload) && typeof payload.message === "string"
-        ? payload.message
-        : isRecord(payload) && typeof payload.error === "string"
-          ? payload.error
-          : `Unable to create booking order (${response.status}).`;
-    throw new Error(errorMessage);
-  }
+  const payload = await post<{ data?: unknown }>(
+    "registrations/booking/order",
+    { courseId },
+    headers
+  );
 
   if (!isRecord(payload) || !isBookingOrder(payload.data)) {
     throw new Error("The booking service returned incomplete order details.");
