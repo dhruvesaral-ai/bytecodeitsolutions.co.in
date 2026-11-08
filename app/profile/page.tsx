@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  User,
   Phone,
   Mail,
   ShieldCheck,
@@ -15,147 +14,20 @@ import {
   ArrowLeft,
   Loader2,
   CheckCircle2,
-  AlertCircle,
   Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading, logout, sendOtp, verifyOtp, resendOtp } = useAuth();
-
-  // Login form state if unauthenticated
-  const [step, setStep] = useState<"phone" | "otp">("phone");
-  const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
-  const [submitting, setSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [resendCooldown, setResendCooldown] = useState(0);
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [loggingOut, setLoggingOut] = useState(false);
-  const otpInputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Resend cooldown timer
   useEffect(() => {
-    if (resendCooldown <= 0) return;
-    const timer = setInterval(() => {
-      setResendCooldown((prev) => prev - 1);
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [resendCooldown]);
-
-  // Focus first OTP input on step switch
-  useEffect(() => {
-    if (step === "otp") {
-      setTimeout(() => {
-        otpInputsRef.current[0]?.focus();
-      }, 50);
+    if (!isLoading && (!isAuthenticated || !user)) {
+      router.replace("/login?next=/profile");
     }
-  }, [step]);
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const cleaned = e.target.value.replace(/\D/g, "").slice(0, 10);
-    setPhone(cleaned);
-    setErrorMessage("");
-  };
-
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (phone.length !== 10) {
-      setErrorMessage("Please enter a valid 10-digit mobile number");
-      return;
-    }
-
-    setSubmitting(true);
-    setErrorMessage("");
-    try {
-      const res = await sendOtp(phone);
-      if (res.success) {
-        setStep("otp");
-        setResendCooldown(30);
-      } else {
-        setErrorMessage(res.error || "Failed to send OTP. Please check the number and try again.");
-      }
-    } catch {
-      setErrorMessage("Unable to send OTP at this time. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleOtpChange = (index: number, value: string) => {
-    const cleaned = value.replace(/\D/g, "");
-    if (!cleaned && value !== "") return;
-
-    const char = cleaned.slice(-1);
-    const updated = [...otp];
-    updated[index] = char;
-    setOtp(updated);
-    setErrorMessage("");
-
-    if (char && index < 3) {
-      otpInputsRef.current[index + 1]?.focus();
-    }
-  };
-
-  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      otpInputsRef.current[index - 1]?.focus();
-    }
-  };
-
-  const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 4);
-    if (!pasted) return;
-
-    const updated = [...otp];
-    for (let i = 0; i < pasted.length; i++) {
-      updated[i] = pasted[i];
-    }
-    setOtp(updated);
-    const focusIndex = Math.min(pasted.length, 3);
-    otpInputsRef.current[focusIndex]?.focus();
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const code = otp.join("");
-    if (code.length !== 4) {
-      setErrorMessage("Please enter all 4 digits of the OTP");
-      return;
-    }
-
-    setSubmitting(true);
-    setErrorMessage("");
-    try {
-      const res = await verifyOtp(phone, code);
-      if (!res.success) {
-        setErrorMessage(res.error || "Incorrect OTP. Please try again.");
-      }
-    } catch {
-      setErrorMessage("Failed to verify OTP. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleResend = async (retrytype: "text" | "voice" = "text") => {
-    if (resendCooldown > 0) return;
-    setSubmitting(true);
-    setErrorMessage("");
-    try {
-      const res = await resendOtp(phone, retrytype);
-      if (res.success) {
-        setResendCooldown(30);
-      } else {
-        setErrorMessage(res.error || "Failed to resend OTP");
-      }
-    } catch {
-      setErrorMessage("Failed to resend OTP");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  }, [isAuthenticated, isLoading, router, user]);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -167,7 +39,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || !isAuthenticated || !user) {
     return (
       <main className="min-h-[60vh] flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-3 text-neutral-500">
@@ -178,171 +50,6 @@ export default function ProfilePage() {
     );
   }
 
-  // ==========================================
-  // 1. Unauthenticated View (Login with OTP)
-  // ==========================================
-  if (!isAuthenticated || !user) {
-    return (
-      <main className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 sm:p-8 shadow-xl">
-          <div className="text-center mb-6">
-            <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-[#1550A5]/10 text-[#1550A5] dark:bg-blue-400/10 dark:text-blue-400">
-              <User className="size-6" />
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
-              Student Profile
-            </h1>
-            <p className="mt-1 text-xs sm:text-sm text-neutral-600 dark:text-neutral-400">
-              {step === "phone"
-                ? "Enter your mobile number to sign in or view your profile"
-                : `Enter the 4-digit code sent to +91 ${phone}`}
-            </p>
-          </div>
-
-          {step === "phone" ? (
-            <form onSubmit={handleSendOtp} className="space-y-4">
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="profile-phone"
-                  className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300"
-                >
-                  Mobile Number
-                </label>
-                <div className="flex h-11 w-full rounded-lg border border-neutral-300 bg-white focus-within:border-[#1550A5] focus-within:ring-2 focus-within:ring-[#1550A5]/20 dark:border-neutral-700 dark:bg-neutral-900">
-                  <span className="flex items-center justify-center border-r border-neutral-200 bg-neutral-50 px-3.5 text-xs font-semibold text-neutral-600 select-none dark:border-neutral-800 dark:bg-neutral-800/60 dark:text-neutral-300">
-                    +91
-                  </span>
-                  <input
-                    id="profile-phone"
-                    type="tel"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    maxLength={10}
-                    value={phone}
-                    onChange={handlePhoneChange}
-                    placeholder="Enter 10-digit number"
-                    className="w-full bg-transparent px-3 text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:outline-none dark:text-white"
-                  />
-                </div>
-              </div>
-
-              {errorMessage && (
-                <div className="flex items-center gap-2 rounded-md bg-red-50 dark:bg-red-950/40 p-2.5 text-xs text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/60">
-                  <AlertCircle className="size-4 shrink-0" />
-                  <span>{errorMessage}</span>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={phone.length !== 10 || submitting}
-                className="w-full h-11 flex items-center justify-center gap-2 rounded-lg bg-[#1550A5] text-sm font-semibold text-white transition-colors hover:bg-[#124288] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5]"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" />
-                    <span>Sending OTP...</span>
-                  </>
-                ) : (
-                  <span>Send OTP</span>
-                )}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleVerifyOtp} className="space-y-5">
-              <div className="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400">
-                <span>Code sent to +91 {phone}</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStep("phone");
-                    setErrorMessage("");
-                  }}
-                  className="flex items-center gap-1 text-[#1550A5] dark:text-blue-400 hover:underline font-medium cursor-pointer"
-                >
-                  <ArrowLeft className="size-3" />
-                  <span>Edit number</span>
-                </button>
-              </div>
-
-              {/* 4-Box OTP Input */}
-              <div className="flex items-center justify-center gap-3 py-2">
-                {otp.map((digit, index) => (
-                  <input
-                    key={index}
-                    ref={(el) => {
-                      otpInputsRef.current[index] = el;
-                    }}
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleOtpChange(index, e.target.value)}
-                    onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                    onPaste={handleOtpPaste}
-                    aria-label={`Digit ${index + 1}`}
-                    className="h-12 w-12 rounded-lg border border-neutral-300 bg-white text-center text-lg font-bold text-neutral-900 focus:border-[#1550A5] focus:outline-none focus:ring-2 focus:ring-[#1550A5]/20 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
-                  />
-                ))}
-              </div>
-
-              {errorMessage && (
-                <div className="flex items-center gap-2 rounded-md bg-red-50 dark:bg-red-950/40 p-2.5 text-xs text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/60">
-                  <AlertCircle className="size-4 shrink-0" />
-                  <span>{errorMessage}</span>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={otp.some((d) => !d) || submitting}
-                className="w-full h-11 flex items-center justify-center gap-2 rounded-lg bg-[#1550A5] text-sm font-semibold text-white transition-colors hover:bg-[#124288] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5]"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" />
-                    <span>Verifying...</span>
-                  </>
-                ) : (
-                  <span>Verify & Sign In</span>
-                )}
-              </button>
-
-              <div className="flex items-center justify-between pt-1 text-xs text-neutral-500">
-                <span>Didn&apos;t receive code?</span>
-                {resendCooldown > 0 ? (
-                  <span className="font-medium text-neutral-400">Resend in {resendCooldown}s</span>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleResend("text")}
-                      className="font-semibold text-[#1550A5] dark:text-blue-400 hover:underline cursor-pointer"
-                    >
-                      Resend SMS
-                    </button>
-                    <span>•</span>
-                    <button
-                      type="button"
-                      onClick={() => handleResend("voice")}
-                      className="font-semibold text-[#1550A5] dark:text-blue-400 hover:underline cursor-pointer"
-                    >
-                      Call Me
-                    </button>
-                  </div>
-                )}
-              </div>
-            </form>
-          )}
-        </div>
-      </main>
-    );
-  }
-
-  // ==========================================
-  // 2. Authenticated Profile View
-  // ==========================================
   const displayName = user.profile?.name || `Student ${user.username.slice(-4)}`;
   const displayEmail = user.profile?.email || "Not specified";
   const displayPhone = user.username.startsWith("91") && user.username.length === 12

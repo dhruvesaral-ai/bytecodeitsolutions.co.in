@@ -167,16 +167,18 @@ export default function AppSidebar() {
 
             {/* Bottom Footer Actions */}
             <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 space-y-3 shrink-0">
-              {isAuthenticated && (
-                <Link
-                  href="/profile"
-                  onClick={closeSidebar}
-                  className="w-full flex items-center justify-center gap-2 rounded-md border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 px-4 py-2.5 text-sm font-semibold text-neutral-800 dark:text-neutral-200 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer"
-                >
-                  <User className="size-4 text-[#1550A5] dark:text-blue-400" />
-                  <span>My Profile ({user?.username})</span>
-                </Link>
-              )}
+              <Link
+                href={isAuthenticated ? "/profile" : "/login?next=/profile"}
+                onClick={closeSidebar}
+                className="w-full flex items-center justify-center gap-2 rounded-md border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 px-4 py-2.5 text-sm font-semibold text-neutral-800 dark:text-neutral-200 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer"
+              >
+                <User className="size-4 text-[#1550A5] dark:text-blue-400" />
+                <span>
+                  {isAuthenticated
+                    ? `My Profile (${user?.username})`
+                    : "Sign in"}
+                </span>
+              </Link>
               <button
                 type="button"
                 onClick={() => {

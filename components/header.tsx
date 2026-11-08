@@ -80,7 +80,7 @@ export default function Header({ initialPages }: HeaderProps = {}) {
   const [mounted, setMounted] = useState(false);
   const { openNav, setNavItems: setSidebarNavItems } = useSidebar();
   const { openEnquiry } = useEnquiry();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [navItems, setNavItems] = useState<NavItem[]>(() =>
     initialPages && initialPages.length > 0 ? pagesToNavItems(initialPages) : []
   );
@@ -177,12 +177,15 @@ export default function Header({ initialPages }: HeaderProps = {}) {
             )}
           </button>
 
-          {/* Profile Icon (when authenticated) */}
-          {isAuthenticated && (
+          {!isAuthLoading && (
             <Link
-              href="/profile"
-              aria-label="View Profile"
-              title={user?.profile?.name || user?.username || "My Profile"}
+              href={isAuthenticated ? "/profile" : "/login?next=/profile"}
+              aria-label={isAuthenticated ? "View Profile" : "Sign in"}
+              title={
+                isAuthenticated
+                  ? user?.profile?.name || user?.username || "My Profile"
+                  : "Sign in"
+              }
               className="hidden md:flex h-9 w-9 items-center justify-center rounded-full border border-neutral-300 bg-white text-[#1550A5] transition-colors hover:bg-neutral-100 hover:border-[#1550A5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] dark:border-neutral-700 dark:bg-black dark:text-blue-400 dark:hover:bg-neutral-900 cursor-pointer"
             >
               <User className="h-4.5 w-4.5" />
@@ -200,11 +203,15 @@ export default function Header({ initialPages }: HeaderProps = {}) {
 
         {/* Mobile Controls (Profile & Theme Toggle & Menu Button) */}
         <div className="flex items-center gap-2 md:hidden">
-          {isAuthenticated && (
+          {!isAuthLoading && (
             <Link
-              href="/profile"
-              aria-label="View Profile"
-              title={user?.profile?.name || user?.username || "My Profile"}
+              href={isAuthenticated ? "/profile" : "/login?next=/profile"}
+              aria-label={isAuthenticated ? "View Profile" : "Sign in"}
+              title={
+                isAuthenticated
+                  ? user?.profile?.name || user?.username || "My Profile"
+                  : "Sign in"
+              }
               className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-300 bg-white text-[#1550A5] transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] dark:border-neutral-700 dark:bg-black dark:text-blue-400 dark:hover:bg-neutral-900 cursor-pointer"
             >
               <User className="h-4.5 w-4.5" />
