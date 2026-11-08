@@ -1,27 +1,36 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { X, ArrowLeft } from "lucide-react";
+import { X, ArrowLeft, Loader2 } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onAuthenticated: (accessToken: string) => void;
 }
 
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export default function LoginModal({
+  isOpen,
+  onClose,
+  onAuthenticated,
+}: LoginModalProps) {
+  const { sendOtp, verifyOtp, resendOtp } = useAuth();
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
   const otpInputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Reset state whenever modal is opened
   useEffect(() => {
-    if (isOpen) {
-      setStep("phone");
-      setPhone("");
-      setOtp(["", "", "", ""]);
-    }
-  }, [isOpen]);
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((previous) => previous - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   // Handle ESC key to close modal
   useEffect(() => {
@@ -48,12 +57,27 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const numericOnly = e.target.value.replace(/\D/g, "").slice(0, 10);
     setPhone(numericOnly);
+    setErrorMessage("");
   };
 
-  const handleSendOtp = (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (phone.length === 10) {
+    if (phone.length !== 10 || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setErrorMessage("");
+    try {
+      const response = await sendOtp(phone);
+      if (!response.success) {
+        setErrorMessage(response.error || "Failed to send OTP. Please try again.");
+        return;
+      }
       setStep("otp");
+      setResendCooldown(30);
+    } catch {
+      setErrorMessage("Unable to send OTP at this time. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -66,6 +90,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     const updated = [...otp];
     updated[index] = char;
     setOtp(updated);
+    setErrorMessage("");
 
     // Auto-advance focus to next box
     if (char && index < 3) {
@@ -96,10 +121,44 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     otpInputsRef.current[focusIndex]?.focus();
   };
 
-  const handleVerifyOtp = (e: React.FormEvent) => {
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    // UI-only for now; ready for backend logic
-    onClose();
+    if (!isOtpComplete || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setErrorMessage("");
+    try {
+      const response = await verifyOtp(phone, otp.join(""));
+      if (!response.success || !response.accessToken) {
+        setErrorMessage(response.error || "Incorrect OTP. Please try again.");
+        return;
+      }
+      onAuthenticated(response.accessToken);
+      onClose();
+    } catch {
+      setErrorMessage("Failed to verify OTP. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0 || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setErrorMessage("");
+    try {
+      const response = await resendOtp(phone);
+      if (!response.success) {
+        setErrorMessage(response.error || "Failed to resend OTP. Please try again.");
+        return;
+      }
+      setResendCooldown(30);
+    } catch {
+      setErrorMessage("Failed to resend OTP. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isPhoneValid = phone.length === 10;
@@ -107,7 +166,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 transition-opacity"
+      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 p-4 transition-opacity"
       role="dialog"
       aria-modal="true"
       aria-labelledby="login-modal-title"
@@ -188,11 +247,17 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
             <button
               type="submit"
-              disabled={!isPhoneValid}
-              className="w-full rounded-md bg-[#1550A5] py-2.5 text-xs font-semibold text-white transition-colors hover:bg-[#124288] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5]"
+              disabled={!isPhoneValid || isSubmitting}
+              className="flex w-full items-center justify-center gap-2 rounded-md bg-[#1550A5] py-2.5 text-xs font-semibold text-white transition-colors hover:bg-[#124288] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5]"
             >
-              Send OTP
+              {isSubmitting && <Loader2 className="size-4 animate-spin" />}
+              {isSubmitting ? "Sending..." : "Send OTP"}
             </button>
+            {errorMessage && (
+              <p role="alert" className="text-xs text-red-600 dark:text-red-400">
+                {errorMessage}
+              </p>
+            )}
           </form>
         )}
 
@@ -242,24 +307,30 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
             <button
               type="submit"
-              disabled={!isOtpComplete}
-              className="w-full rounded-md bg-[#1550A5] py-2.5 text-xs font-semibold text-white transition-colors hover:bg-[#124288] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5]"
+              disabled={!isOtpComplete || isSubmitting}
+              className="flex w-full items-center justify-center gap-2 rounded-md bg-[#1550A5] py-2.5 text-xs font-semibold text-white transition-colors hover:bg-[#124288] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5]"
             >
-              Verify OTP
+              {isSubmitting && <Loader2 className="size-4 animate-spin" />}
+              {isSubmitting ? "Verifying..." : "Verify OTP"}
             </button>
 
             <div className="text-center pt-1">
               <button
                 type="button"
-                onClick={() => {
-                  setOtp(["", "", "", ""]);
-                  otpInputsRef.current[0]?.focus();
-                }}
-                className="text-xs text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors cursor-pointer"
+                onClick={handleResendOtp}
+                disabled={resendCooldown > 0 || isSubmitting}
+                className="text-xs text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Didn&apos;t receive code? <span className="font-medium text-[#1550A5] dark:text-blue-400 underline">Resend</span>
+                {resendCooldown > 0
+                  ? `Resend code in ${resendCooldown}s`
+                  : <>Didn&apos;t receive code? <span className="font-medium text-[#1550A5] dark:text-blue-400 underline">Resend</span></>}
               </button>
             </div>
+            {errorMessage && (
+              <p role="alert" className="text-center text-xs text-red-600 dark:text-red-400">
+                {errorMessage}
+              </p>
+            )}
           </form>
         )}
       </div>

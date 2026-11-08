@@ -4,6 +4,7 @@ import Script from "next/script";
 import { useState } from "react";
 import { X } from "lucide-react";
 import EnquireNow from "@/components/enquire-now";
+import LoginModal from "@/components/login";
 import { useAuth } from "@/context/auth-context";
 import { useEnquiry } from "@/context/enquiry-context";
 import { createBookingOrder } from "@/services/RegistrationService";
@@ -96,9 +97,11 @@ export default function CourseDetailActions({
   bookingAmount,
   installmentPlans,
 }: CourseDetailActionsProps) {
-  const { accessToken, user } = useAuth();
+  const { accessToken, isAuthenticated, isLoading: isAuthLoading, user } =
+    useAuth();
   const { openEnquiry } = useEnquiry();
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRazorpayReady, setIsRazorpayReady] = useState(false);
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [bookingError, setBookingError] = useState("");
@@ -110,14 +113,19 @@ export default function CourseDetailActions({
     activePlans[0]?.id ?? ""
   );
 
-  const handleProceedToPay = async () => {
+  const handleProceedToPay = async (authenticatedToken = accessToken) => {
     if (isCreatingOrder) return;
+    if (!isAuthenticated && !authenticatedToken) {
+      setIsLoginOpen(true);
+      return;
+    }
+
     setBookingError("");
     setCheckoutMessage("");
     setIsCreatingOrder(true);
 
     try {
-      const order = await createBookingOrder(courseId, accessToken);
+      const order = await createBookingOrder(courseId, authenticatedToken);
       if (!window.Razorpay) {
         throw new Error("Razorpay checkout is not ready. Please try again.");
       }
@@ -315,13 +323,17 @@ export default function CourseDetailActions({
                   )}
                   <button
                     type="button"
-                    disabled={!isRazorpayReady || isCreatingOrder}
-                    onClick={handleProceedToPay}
+                    disabled={
+                      !isRazorpayReady || isCreatingOrder || isAuthLoading
+                    }
+                    onClick={() => void handleProceedToPay()}
                     className="rounded-md bg-[#1550A5] px-4 py-3 text-sm font-semibold text-white hover:bg-[#124288] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isCreatingOrder
                       ? "Preparing checkout..."
-                      : isRazorpayReady
+                      : isAuthLoading
+                        ? "Checking sign-in..."
+                        : isRazorpayReady
                         ? "Proceed to pay"
                         : "Loading payment..."}
                   </button>
@@ -330,6 +342,16 @@ export default function CourseDetailActions({
             </section>
           </div>
         </>
+      )}
+      {isLoginOpen && (
+        <LoginModal
+          isOpen
+          onClose={() => setIsLoginOpen(false)}
+          onAuthenticated={(token) => {
+            setIsLoginOpen(false);
+            void handleProceedToPay(token);
+          }}
+        />
       )}
       <EnquireNow showButton={false} />
     </>
