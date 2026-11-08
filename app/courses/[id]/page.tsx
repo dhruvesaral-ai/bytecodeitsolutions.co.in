@@ -248,6 +248,8 @@ async function CourseDetails({
       </article>
     </main>
     <CourseDetailActions
+      courseId={course.id}
+      courseName={course.name}
       bookingAmount={course.bookingAmount}
       installmentPlans={course.installmentPlans}
     />
