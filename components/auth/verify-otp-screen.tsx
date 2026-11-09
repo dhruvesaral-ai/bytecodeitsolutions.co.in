@@ -18,20 +18,22 @@ export default function VerifyOtpScreen({ nextPath }: { nextPath: string }) {
   const otpInputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
+    if (isLoading) return;
+
+    if (isAuthenticated) {
+      clearPendingMobile();
+      router.replace(nextPath);
+      return;
+    }
+
     const pendingMobile = readPendingMobile();
     if (!pendingMobile) {
       router.replace(`/login?next=${encodeURIComponent(nextPath)}`);
       return;
     }
+
     setMobile(pendingMobile);
     setReady(true);
-  }, [nextPath, router]);
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      clearPendingMobile();
-      router.replace(nextPath);
-    }
   }, [isAuthenticated, isLoading, nextPath, router]);
 
   useEffect(() => {

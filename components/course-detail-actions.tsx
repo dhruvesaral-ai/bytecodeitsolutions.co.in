@@ -62,6 +62,8 @@ export default function CourseDetailActions({
   );
 
   const handleProceedToBuy = () => {
+    if (isAuthLoading) return;
+
     const selectedPlan = activePlans.find((plan) => plan.id === selectedPlanId);
     saveCheckoutIntent({
       courseId,
@@ -70,12 +72,12 @@ export default function CourseDetailActions({
       planLabel: selectedPlan ? formatPlan(selectedPlan.installments) : null,
     });
 
-    if (!isAuthenticated) {
-      router.push("/login?next=/checkout");
+    if (isAuthenticated) {
+      router.push("/checkout");
       return;
     }
 
-    router.push("/checkout");
+    router.push("/login?next=/checkout");
   };
 
   return (

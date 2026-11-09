@@ -9,10 +9,14 @@ import { useAuth } from "@/context/auth-context";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
-/** "course" targets training pages, "message" targets the development pages. */
 export type EnquiryMode = "course" | "message";
 
 const DEFAULT_UTM_SOURCE = "google_search";
+
+function normalizeIndianMobile(value: string): string {
+  const digits = value.replace(/\D/g, "").replace(/^91(?=\d{10}$)/, "");
+  return digits.length === 10 ? digits : "";
+}
 
 function resolveUtmSource(): string {
   if (typeof window === "undefined") return DEFAULT_UTM_SOURCE;
@@ -20,10 +24,6 @@ function resolveUtmSource(): string {
   return param?.trim() || DEFAULT_UTM_SOURCE;
 }
 
-/**
- * Owns the enquiry form state outside the sheet, so the floating
- * "Enquire Now" button can double as the submit control.
- */
 export function useEnquiryForm(
   isOpen: boolean,
   onClose: () => void,
@@ -45,20 +45,22 @@ export function useEnquiryForm(
   const [showRequiredHint, setShowRequiredHint] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
-  // Pre-fill user data if already authenticated
+  const accountMobile =
+    isAuthenticated && user ? normalizeIndianMobile(user.username) : "";
+
+  // Pre-fill from the signed-in account when the modal opens
   useEffect(() => {
-    if (user && isOpen) {
-      if (user.profile?.name) {
-        const parts = user.profile.name.trim().split(" ");
-        if (!firstName) setFirstName(parts[0] || "");
-        if (!lastName && parts.length > 1) setLastName(parts.slice(1).join(" "));
-      }
-      if (!phone && user.username) {
-        const clean = user.username.replace(/^91/, "").replace(/\D/g, "");
-        if (clean.length === 10) setPhone(clean);
-      }
+    if (!isOpen || !isAuthenticated || !user) return;
+
+    if (user.profile?.name) {
+      const parts = user.profile.name.trim().split(" ");
+      setFirstName(parts[0] || "");
+      setLastName(parts.length > 1 ? parts.slice(1).join(" ") : "");
     }
-  }, [user, isOpen, firstName, lastName, phone]);
+    if (accountMobile) {
+      setPhone(accountMobile);
+    }
+  }, [isOpen, isAuthenticated, user, accountMobile]);
 
   // Resend cooldown timer
   useEffect(() => {
@@ -69,10 +71,13 @@ export function useEnquiryForm(
     return () => clearInterval(timer);
   }, [resendCooldown]);
 
+  const mobileForSubmit =
+    isAuthenticated && accountMobile ? accountMobile : phone;
+
   const isValid =
     firstName.trim() !== "" &&
     lastName.trim() !== "" &&
-    phone.length === 10 &&
+    mobileForSubmit.length === 10 &&
     (mode === "course" ? courseId !== "" : true);
 
   // Load the live course list from backend API on mount
@@ -154,10 +159,12 @@ export function useEnquiryForm(
   );
 
   const submitLeadDirectly = useCallback(async () => {
+    const leadMobile =
+      isAuthenticated && accountMobile ? accountMobile : phone;
     await createWebLead({
       firstName: firstName.trim(),
       lastName: lastName.trim(),
-      username: phone,
+      username: leadMobile,
       utmSource: resolveUtmSource(),
       courseId: mode === "course" ? courseId : null,
       message: mode === "message" ? message.trim() || null : null,
@@ -166,7 +173,17 @@ export function useEnquiryForm(
     });
     setSubmitState("success");
     setTimeout(onClose, 1800);
-  }, [courseId, firstName, lastName, message, mode, onClose, phone]);
+  }, [
+    accountMobile,
+    courseId,
+    firstName,
+    isAuthenticated,
+    lastName,
+    message,
+    mode,
+    onClose,
+    phone,
+  ]);
 
   const submit = useCallback(async () => {
     if (submitState === "submitting") return;
@@ -181,9 +198,7 @@ export function useEnquiryForm(
       setSubmitState("submitting");
       setErrorMessage("");
 
-      // If user is already authenticated with this number, skip OTP!
-      const userPhone = user?.username ? user.username.replace(/^91/, "") : "";
-      if (isAuthenticated && userPhone === phone) {
+      if (isAuthenticated && accountMobile) {
         try {
           await submitLeadDirectly();
         } catch (error) {
@@ -194,7 +209,7 @@ export function useEnquiryForm(
         return;
       }
 
-      // Otherwise send OTP to verify the mobile number
+      // Guests: verify mobile with OTP before submitting
       try {
         const res = await sendOtp(phone);
         if (res.success) {
@@ -245,13 +260,15 @@ export function useEnquiryForm(
     step,
     submitLeadDirectly,
     submitState,
-    user?.username,
+    accountMobile,
     isAuthenticated,
     verifyOtp,
   ]);
 
   return {
     mode,
+    isAuthenticated,
+    accountMobile,
     step,
     setStep,
     firstName,
@@ -540,34 +557,53 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
               </div>
             </div>
 
-            {/* Mobile Number */}
+            {/* Mobile — signed-in users use verified account number (no re-entry / OTP) */}
             <div className="space-y-1.5">
               <label
-                htmlFor="enquiry-phone"
+                htmlFor={
+                  form.isAuthenticated && form.accountMobile
+                    ? undefined
+                    : "enquiry-phone"
+                }
                 className="block text-xs font-medium text-blue-50"
               >
                 Mobile Number <span className="text-[#F58216]">*</span>
               </label>
-              <div className="flex h-10 w-full rounded-md border border-white/30 bg-white focus-within:border-[#F58216] focus-within:ring-1 focus-within:ring-[#F58216]">
-                <span className="flex items-center justify-center border-r border-neutral-300 bg-neutral-100 px-3 text-xs font-semibold text-neutral-500 select-none">
-                  +91
-                </span>
-                <input
-                  id="enquiry-phone"
-                  type="tel"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  maxLength={10}
-                  value={form.phone}
-                  onChange={(e) => form.handlePhoneChange(e.target.value)}
-                  placeholder="Enter 10-digit number"
-                  className="w-full bg-transparent px-3 text-base sm:text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:outline-none"
-                />
-              </div>
-              {form.phone.length > 0 && form.phone.length < 10 && (
-                <p className="text-[11px] text-amber-200">
-                  Please enter a valid 10-digit mobile number.
-                </p>
+              {form.isAuthenticated && form.accountMobile ? (
+                <div className="flex h-10 w-full items-center gap-2 rounded-md border border-white/30 bg-white/95 px-3 text-sm font-medium text-neutral-900">
+                  <ShieldCheck
+                    className="size-4 shrink-0 text-emerald-600"
+                    aria-hidden="true"
+                  />
+                  <span className="font-mono">+91 {form.accountMobile}</span>
+                  <span className="ml-auto text-[11px] font-medium text-emerald-700">
+                    Verified
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <div className="flex h-10 w-full rounded-md border border-white/30 bg-white focus-within:border-[#F58216] focus-within:ring-1 focus-within:ring-[#F58216]">
+                    <span className="flex items-center justify-center border-r border-neutral-300 bg-neutral-100 px-3 text-xs font-semibold text-neutral-500 select-none">
+                      +91
+                    </span>
+                    <input
+                      id="enquiry-phone"
+                      type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={10}
+                      value={form.phone}
+                      onChange={(e) => form.handlePhoneChange(e.target.value)}
+                      placeholder="Enter 10-digit number"
+                      className="w-full bg-transparent px-3 text-base sm:text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:outline-none"
+                    />
+                  </div>
+                  {form.phone.length > 0 && form.phone.length < 10 && (
+                    <p className="text-[11px] text-amber-200">
+                      Please enter a valid 10-digit mobile number.
+                    </p>
+                  )}
+                </>
               )}
             </div>
 

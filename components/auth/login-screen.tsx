@@ -26,7 +26,7 @@ export default function LoginScreen({ nextPath }: { nextPath: string }) {
 
   const handleSendOtp = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (phone.length !== 10 || submitting) return;
+    if (isAuthenticated || phone.length !== 10 || submitting) return;
 
     setSubmitting(true);
     setErrorMessage("");
