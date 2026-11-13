@@ -66,15 +66,10 @@ export default function ProfilePage() {
   return (
     <main className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
       {/* Back to courses */}
-      <div className="mb-6">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1550A5] dark:text-blue-400 hover:underline"
-        >
-          <ArrowLeft className="size-3.5" />
-          <span>Back to Home</span>
-        </Link>
-      </div>
+      <Link href="/courses">
+        <ArrowLeft className="size-3.5" />
+        <span className="text-xs font-semibold text-[#1550A5] dark:text-blue-400 hover:underline">Back to Courses</span>
+      </Link>
 
       {/* Profile Header Banner Card */}
       <div className="overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm">

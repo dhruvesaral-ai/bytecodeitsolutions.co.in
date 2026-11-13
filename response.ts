@@ -26,6 +26,7 @@ export interface InstallmentPlanResponse {
   id: string;
   courseId: string;
   isActive: boolean;
+  discountPercent?: string;
   installments: InstallmentResponse[];
 }
 
@@ -35,8 +36,7 @@ export interface CourseByIdResponse {
   shortDescription: string;
   longDescription: string | null;
   originalPrice: string;
-  discountedPrice: string;
-  bookingAmount: string;
+  bookingAmount: string | null;
   rating: number;
   technologyTags: string[];
   duration: string;

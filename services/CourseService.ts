@@ -45,7 +45,8 @@ interface CourseInstallment extends Omit<InstallmentResponse, "amount"> {
 }
 
 interface CourseInstallmentPlan
-  extends Omit<InstallmentPlanResponse, "installments"> {
+  extends Omit<InstallmentPlanResponse, "installments" | "discountPercent"> {
+  discountPercent: number;
   installments: CourseInstallment[];
 }
 
@@ -90,6 +91,9 @@ function isInstallmentPlanResponse(
     typeof value.id === "string" &&
     typeof value.courseId === "string" &&
     typeof value.isActive === "boolean" &&
+    (value.discountPercent === undefined ||
+      typeof value.discountPercent === "string" ||
+      typeof value.discountPercent === "number") &&
     Array.isArray(value.installments) &&
     value.installments.every(isInstallmentResponse)
   );
@@ -104,8 +108,7 @@ function isCourseByIdResponse(value: unknown): value is CourseByIdResponse {
     (typeof value.longDescription === "string" ||
       value.longDescription === null) &&
     typeof value.originalPrice === "string" &&
-    typeof value.discountedPrice === "string" &&
-    typeof value.bookingAmount === "string" &&
+    (typeof value.bookingAmount === "string" || value.bookingAmount === null) &&
     typeof value.rating === "number" &&
     Array.isArray(value.technologyTags) &&
     value.technologyTags.every((tag) => typeof tag === "string") &&
@@ -147,6 +150,30 @@ function parsePrice(value: unknown, field: string, index: number): number {
     throw new Error(`Courses API returned an invalid ${field} for item ${index}.`);
   }
   return price;
+}
+
+/** Lowest total payable (booking + installments) across active plans. */
+function deriveDiscountedPrice(
+  originalPrice: number,
+  bookingAmount: number | null,
+  installmentPlans: CourseInstallmentPlan[]
+): number {
+  const booking = bookingAmount ?? 0;
+  const activePlans = installmentPlans.filter(
+    (plan) => plan.isActive && plan.installments.length > 0
+  );
+
+  if (activePlans.length === 0) {
+    return originalPrice;
+  }
+
+  const payableTotals = activePlans.map(
+    (plan) =>
+      booking +
+      plan.installments.reduce((sum, installment) => sum + installment.amount, 0)
+  );
+
+  return Math.min(...payableTotals);
 }
 
 function parseCourse(value: unknown, index: number): Course {
@@ -199,6 +226,11 @@ function parseCourse(value: unknown, index: number): Course {
           id: plan.id,
           courseId: plan.courseId,
           isActive: plan.isActive,
+          discountPercent: parsePrice(
+            "discountPercent" in plan ? plan.discountPercent : 0,
+            "discountPercent",
+            planIndex
+          ),
           installments: plan.installments.map((installment, installmentIndex) => {
             if (!isInstallmentResponse(installment)) {
               throw new Error(
@@ -221,18 +253,25 @@ function parseCourse(value: unknown, index: number): Course {
       })
     : [];
 
+  const originalPrice = parsePrice(value.originalPrice, "originalPrice", index);
+  const bookingAmount =
+    value.bookingAmount === undefined || value.bookingAmount === null
+      ? null
+      : parsePrice(value.bookingAmount, "bookingAmount", index);
+  const discountedPrice =
+    value.discountedPrice !== undefined && value.discountedPrice !== null
+      ? parsePrice(value.discountedPrice, "discountedPrice", index)
+      : deriveDiscountedPrice(originalPrice, bookingAmount, installmentPlans);
+
   return {
     id: value.id,
     name: value.name,
     shortDescription: description,
     longDescription:
       typeof value.longDescription === "string" ? value.longDescription : null,
-    originalPrice: parsePrice(value.originalPrice, "originalPrice", index),
-    discountedPrice: parsePrice(value.discountedPrice, "discountedPrice", index),
-    bookingAmount:
-      value.bookingAmount === undefined || value.bookingAmount === null
-        ? null
-        : parsePrice(value.bookingAmount, "bookingAmount", index),
+    originalPrice,
+    discountedPrice,
+    bookingAmount,
     rating: typeof value.rating === "number" ? value.rating : 0,
     technologyTags,
     duration: typeof value.duration === "string" ? value.duration : "",
