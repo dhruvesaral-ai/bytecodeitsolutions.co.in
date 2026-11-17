@@ -1,12 +1,11 @@
-const useLocalBackend = process.env.NEXT_PUBLIC_USE_LOCAL_BACKEND === "true";
+const isDev = false;
 
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://bytecode.co.in";
+export const SITE_URL = "https://bytecode.co.in";
 
-export const BACKEND_URL = useLocalBackend
+export const BACKEND_URL = isDev
   ? "http://localhost:3001/api/"
-  : (process.env.NEXT_PUBLIC_BACKEND_URL || "https://admin.bytecode.co.in/api/");
+  : "https://admin.bytecode.co.in/api/";
 
-export const MEDIA_BASE_URL = useLocalBackend
+export const MEDIA_BASE_URL = isDev
   ? "http://localhost:3001"
-  : (process.env.NEXT_PUBLIC_MEDIA_URL || "https://admin.bytecode.co.in");
+  : "https://admin.bytecode.co.in";

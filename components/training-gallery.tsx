@@ -8,8 +8,11 @@ interface TrainingGalleryProps {
   images?: string[];
 }
 
+const IMAGES_PER_PAGE = 12;
+
 export default function TrainingGallery({ images = [] }: TrainingGalleryProps) {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
+  const [page, setPage] = useState(0);
 
   const validImages = Array.isArray(images)
     ? images.filter(
@@ -47,38 +50,95 @@ export default function TrainingGallery({ images = [] }: TrainingGalleryProps) {
     };
   }, [activeIdx, handleNext, handlePrev]);
 
+  const totalPages = Math.max(1, Math.ceil(validImages.length / IMAGES_PER_PAGE));
+  const safePage = Math.min(page, totalPages - 1);
+  const pageStart = safePage * IMAGES_PER_PAGE;
+  const pageImages = validImages.slice(pageStart, pageStart + IMAGES_PER_PAGE);
+  const showPagination = validImages.length > IMAGES_PER_PAGE;
+
+  useEffect(() => {
+    if (page > totalPages - 1) {
+      setPage(Math.max(0, totalPages - 1));
+    }
+  }, [page, totalPages]);
+
   if (validImages.length === 0) {
     return null;
   }
 
   return (
     <div className="w-full">
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5 lg:grid-cols-3 xl:grid-cols-4 xl:gap-3">
-        {validImages.map((src, idx) => (
+      <div className="flex w-full flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:justify-center">
+        {pageImages.map((src, idx) => {
+          const globalIdx = pageStart + idx;
+          return (
           <button
-            key={`${src}-${idx}`}
+            key={`${src}-${globalIdx}`}
             type="button"
-            onClick={() => setActiveIdx(idx)}
-            className="group relative w-full overflow-hidden rounded-md border border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5]"
-            aria-label={`Open training photo ${idx + 1}`}
+            onClick={() => setActiveIdx(globalIdx)}
+            className="group relative w-full overflow-hidden rounded-md border border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] sm:w-[200px] sm:shrink-0"
+            aria-label={`Open training photo ${globalIdx + 1}`}
           >
-            <div className="relative aspect-[19/6] w-full">
-              <Image
-                src={src}
-                alt={`Bytecode campus training photo ${idx + 1}`}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                className="object-cover object-center transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-              />
-            </div>
+            <Image
+              src={src}
+              alt={`Bytecode campus training photo ${globalIdx + 1}`}
+              width={400}
+              height={300}
+              sizes="(max-width: 640px) 100vw, 200px"
+              className="block h-auto w-full transition-transform duration-500 ease-out group-hover:scale-[1.02] sm:w-[200px]"
+            />
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-300 group-hover:bg-black/25">
               <div className="flex size-9 scale-90 items-center justify-center rounded-md border border-white/20 bg-[#1550A5]/85 text-white opacity-0 shadow-lg backdrop-blur-sm transition-all duration-300 group-hover:scale-100 group-hover:opacity-100">
                 <Maximize2 className="size-4" />
               </div>
             </div>
           </button>
-        ))}
+          );
+        })}
       </div>
+
+      {showPagination && (
+        <nav
+          className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
+          aria-label="Gallery pagination"
+        >
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPage((prev) => Math.max(0, prev - 1))}
+              disabled={safePage === 0}
+              className="inline-flex items-center gap-1 rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-800 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
+            >
+              <ChevronLeft className="size-4" aria-hidden="true" />
+              Previous
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setPage((prev) => Math.min(totalPages - 1, prev + 1))
+              }
+              disabled={safePage >= totalPages - 1}
+              className="inline-flex items-center gap-1 rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-800 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
+            >
+              Next
+              <ChevronRight className="size-4" aria-hidden="true" />
+            </button>
+          </div>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            Page{" "}
+            <span className="font-semibold text-neutral-900 dark:text-white">
+              {safePage + 1}
+            </span>{" "}
+            of {totalPages}
+            <span className="mx-2 text-neutral-300 dark:text-neutral-600">
+              ·
+            </span>
+            Showing {pageStart + 1}–
+            {Math.min(pageStart + pageImages.length, validImages.length)} of{" "}
+            {validImages.length} photos
+          </p>
+        </nav>
+      )}
 
       {activeIdx !== null && validImages[activeIdx] && (
         <div
@@ -117,18 +177,17 @@ export default function TrainingGallery({ images = [] }: TrainingGalleryProps) {
 
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative flex w-full max-w-6xl items-center justify-center px-10 sm:px-16"
+            className="relative flex max-h-[85vh] w-full max-w-6xl items-center justify-center px-10 sm:px-16"
           >
-            <div className="relative aspect-[19/6] w-full max-h-[min(85vh,56vw)]">
-              <Image
-                src={validImages[activeIdx]}
-                alt={`Bytecode training photo ${activeIdx + 1}`}
-                fill
-                priority
-                sizes="(max-width: 1280px) 100vw, 1152px"
-                className="object-contain"
-              />
-            </div>
+            <Image
+              src={validImages[activeIdx]}
+              alt={`Bytecode training photo ${activeIdx + 1}`}
+              width={1600}
+              height={1200}
+              priority
+              sizes="(max-width: 1280px) 100vw, 1152px"
+              className="max-h-[85vh] w-auto max-w-full object-contain"
+            />
           </div>
 
           {validImages.length > 1 && (
