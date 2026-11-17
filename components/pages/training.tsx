@@ -1,15 +1,11 @@
 "use client";
 
-import React from "react";
 import { formatHeadingHtml } from "@/lib/format-heading";
 import TrainingGallery from "@/components/training-gallery";
 import CustomPageContent from "@/components/custom-page-content";
 import { useEnquiry } from "@/context/enquiry-context";
 import {
   GraduationCap,
-  Users,
-  Award,
-  Layers,
   ArrowRight,
   Camera,
 } from "lucide-react";
@@ -28,13 +24,6 @@ export default function Training({
   content,
 }: TrainingProps) {
   const { openEnquiry } = useEnquiry();
-
-  const stats = [
-    { label: "Colleges Reached", value: "100+", icon: GraduationCap },
-    { label: "Students Trained", value: "20,000+", icon: Users },
-    { label: "Workshops Conducted", value: "500+", icon: Layers },
-    { label: "Hands-on Practical Training", value: "100%", icon: Award },
-  ];
 
   return (
     <div className="w-full flex-1">
