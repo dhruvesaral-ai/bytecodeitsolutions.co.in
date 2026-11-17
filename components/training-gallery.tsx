@@ -20,41 +20,23 @@ export default function TrainingGallery({ images = [] }: TrainingGalleryProps) {
       )
     : [];
 
-  const handlePrev = useCallback(() => {
+  const totalPages = Math.max(1, Math.ceil(validImages.length / IMAGES_PER_PAGE));
+  const safePage = Math.min(page, totalPages - 1);
+  const pageStart = safePage * IMAGES_PER_PAGE;
+  const pageImages = validImages.slice(pageStart, pageStart + IMAGES_PER_PAGE);
+  const showPagination = validImages.length > IMAGES_PER_PAGE;
+
+  const handleLightboxPrev = useCallback(() => {
     if (activeIdx === null || validImages.length === 0) return;
     setActiveIdx(
       (prev) => (prev! - 1 + validImages.length) % validImages.length
     );
   }, [activeIdx, validImages.length]);
 
-  const handleNext = useCallback(() => {
+  const handleLightboxNext = useCallback(() => {
     if (activeIdx === null || validImages.length === 0) return;
     setActiveIdx((prev) => (prev! + 1) % validImages.length);
   }, [activeIdx, validImages.length]);
-
-  useEffect(() => {
-    if (activeIdx === null) return;
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setActiveIdx(null);
-      if (e.key === "ArrowLeft") handlePrev();
-      if (e.key === "ArrowRight") handleNext();
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = "";
-    };
-  }, [activeIdx, handleNext, handlePrev]);
-
-  const totalPages = Math.max(1, Math.ceil(validImages.length / IMAGES_PER_PAGE));
-  const safePage = Math.min(page, totalPages - 1);
-  const pageStart = safePage * IMAGES_PER_PAGE;
-  const pageImages = validImages.slice(pageStart, pageStart + IMAGES_PER_PAGE);
-  const showPagination = validImages.length > IMAGES_PER_PAGE;
 
   useEffect(() => {
     if (page > totalPages - 1) {
@@ -62,40 +44,58 @@ export default function TrainingGallery({ images = [] }: TrainingGalleryProps) {
     }
   }, [page, totalPages]);
 
+  useEffect(() => {
+    if (activeIdx === null) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setActiveIdx(null);
+      if (e.key === "ArrowLeft") handleLightboxPrev();
+      if (e.key === "ArrowRight") handleLightboxNext();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [activeIdx, handleLightboxNext, handleLightboxPrev]);
+
   if (validImages.length === 0) {
     return null;
   }
 
   return (
     <div className="w-full">
-      <div className="flex w-full flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:justify-center">
+      <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
         {pageImages.map((src, idx) => {
           const globalIdx = pageStart + idx;
           return (
-          <button
-            key={`${src}-${globalIdx}`}
-            type="button"
-            onClick={() => setActiveIdx(globalIdx)}
-            className="group relative w-full overflow-hidden rounded-md border border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] sm:w-[200px] sm:shrink-0"
-            aria-label={`Open training photo ${globalIdx + 1}`}
-          >
-            <Image
-              src={src}
-              alt={`Bytecode campus training photo ${globalIdx + 1}`}
-              width={400}
-              height={300}
-              sizes="(max-width: 640px) 100vw, 200px"
-              className="block h-auto w-full transition-transform duration-500 ease-out group-hover:scale-[1.02] sm:w-[200px]"
-            />
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-300 group-hover:bg-black/25">
-              <div className="flex size-9 scale-90 items-center justify-center rounded-md border border-white/20 bg-[#1550A5]/85 text-white opacity-0 shadow-lg backdrop-blur-sm transition-all duration-300 group-hover:scale-100 group-hover:opacity-100">
-                <Maximize2 className="size-4" />
-              </div>
-            </div>
-          </button>
+            <li key={`${src}-${globalIdx}`}>
+              <button
+                type="button"
+                onClick={() => setActiveIdx(globalIdx)}
+                className="group relative w-full overflow-hidden rounded-md border border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5]"
+                aria-label={`Open training photo ${globalIdx + 1}`}
+              >
+                <Image
+                  src={src}
+                  alt={`Bytecode campus training photo ${globalIdx + 1}`}
+                  width={640}
+                  height={480}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="block h-auto w-full transition-transform duration-300 group-hover:scale-[1.02]"
+                />
+                <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/20">
+                  <span className="flex size-9 scale-90 items-center justify-center rounded-md border border-white/20 bg-[#1550A5]/85 text-white opacity-0 shadow-lg transition-all group-hover:scale-100 group-hover:opacity-100">
+                    <Maximize2 className="size-4" aria-hidden="true" />
+                  </span>
+                </span>
+              </button>
+            </li>
           );
         })}
-      </div>
+      </ul>
 
       {showPagination && (
         <nav
@@ -130,12 +130,6 @@ export default function TrainingGallery({ images = [] }: TrainingGalleryProps) {
               {safePage + 1}
             </span>{" "}
             of {totalPages}
-            <span className="mx-2 text-neutral-300 dark:text-neutral-600">
-              ·
-            </span>
-            Showing {pageStart + 1}–
-            {Math.min(pageStart + pageImages.length, validImages.length)} of{" "}
-            {validImages.length} photos
           </p>
         </nav>
       )}
@@ -152,24 +146,24 @@ export default function TrainingGallery({ images = [] }: TrainingGalleryProps) {
             type="button"
             onClick={() => setActiveIdx(null)}
             aria-label="Close preview"
-            className="absolute right-4 top-4 z-50 flex size-10 items-center justify-center rounded-md bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="absolute right-4 top-4 z-50 flex size-10 items-center justify-center rounded-md bg-white/10 text-white hover:bg-white/20"
           >
             <X className="size-5" />
           </button>
 
-          <div className="absolute left-4 top-5 z-50 rounded-md border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
+          <p className="absolute left-4 top-5 z-50 rounded-md border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white">
             {activeIdx + 1} / {validImages.length}
-          </div>
+          </p>
 
           {validImages.length > 1 && (
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                handlePrev();
+                handleLightboxPrev();
               }}
               aria-label="Previous photo"
-              className="absolute left-3 z-50 flex size-11 items-center justify-center rounded-md bg-white/10 text-white backdrop-blur-md transition-all hover:bg-white/25 sm:left-6"
+              className="absolute left-3 z-50 flex size-11 items-center justify-center rounded-md bg-white/10 text-white hover:bg-white/25 sm:left-6"
             >
               <ChevronLeft className="size-6" />
             </button>
@@ -195,10 +189,10 @@ export default function TrainingGallery({ images = [] }: TrainingGalleryProps) {
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                handleNext();
+                handleLightboxNext();
               }}
               aria-label="Next photo"
-              className="absolute right-3 z-50 flex size-11 items-center justify-center rounded-md bg-white/10 text-white backdrop-blur-md transition-all hover:bg-white/25 sm:right-6"
+              className="absolute right-3 z-50 flex size-11 items-center justify-center rounded-md bg-white/10 text-white hover:bg-white/25 sm:right-6"
             >
               <ChevronRight className="size-6" />
             </button>
