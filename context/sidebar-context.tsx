@@ -13,6 +13,9 @@ export type SidebarView = "nav" | "filter";
 export interface NavItem {
   label: string;
   href: string;
+  highlight?: boolean;
+  external?: boolean;
+  openInNewTab?: boolean;
 }
 
 export const DEFAULT_NAV_ITEMS: NavItem[] = [

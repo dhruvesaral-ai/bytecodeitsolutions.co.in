@@ -5,6 +5,11 @@ import { courseService } from "@/services/CourseService";
 import { successStoriesService } from "@/services/SuccessStoriesService";
 import SuccessStories from "@/components/success-stories";
 import PlacementGuaranteedSection from "@/components/placement-guaranteed-section";
+import {
+  filterCategoriesForListing,
+  filterCoursesForListing,
+  hiddenListingCategoryIds,
+} from "@/lib/course-listings";
 
 export default async function HomeContent() {
   const [categoriesData, courses, carousals, successStoryVideoIds] = await Promise.all([
@@ -14,6 +19,8 @@ export default async function HomeContent() {
     successStoriesService.getVideoIds(),
   ]);
 
+  const hiddenCategoryIds = hiddenListingCategoryIds(categoriesData);
+
   const placementCategory = categoriesData.find(
     (category) =>
       category.slug === "100%-placement-opportunity-guaranteed-courses" ||
@@ -22,10 +29,13 @@ export default async function HomeContent() {
 
   const placementCourses = courses.filter(
     (course) =>
+      !hiddenCategoryIds.has(course.courseCategorieId) &&
       (course.isPlacementGurranted ||
         (placementCategory && course.courseCategorieId === placementCategory.id)) &&
       course.status === "active"
   );
+
+  const listingCourses = filterCoursesForListing(courses, categoriesData);
 
   const getCategoryRank = (category: { slug: string; name: string }) => {
     const slug = category.slug.toLowerCase();
@@ -35,13 +45,9 @@ export default async function HomeContent() {
     return 3;
   };
 
-  const categories = categoriesData
-    .filter(
-      (category) =>
-        category.slug !== "bootcamp-courses" &&
-        category.slug !== "100%-placement-opportunity-guaranteed-courses"
-    )
-    .sort((a, b) => getCategoryRank(a) - getCategoryRank(b));
+  const categories = filterCategoriesForListing(categoriesData).sort(
+    (a, b) => getCategoryRank(a) - getCategoryRank(b)
+  );
 
   const homepageCarousel = carousals.find(
     (carousel) => carousel.position === "homepage"
@@ -72,7 +78,7 @@ export default async function HomeContent() {
           <CategoryBox
             key={category.id}
             category={category}
-            courses={courses.filter(
+            courses={listingCourses.filter(
               (course) =>
                 course.courseCategorieId === category.id &&
                 course.status === "active"

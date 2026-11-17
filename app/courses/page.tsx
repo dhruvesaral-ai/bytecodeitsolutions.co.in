@@ -7,6 +7,10 @@ import CustomPageContent from "@/components/custom-page-content";
 import { courseService } from "@/services/CourseService";
 import { pageService } from "@/services/PageService";
 import { formatHeadingHtml } from "@/lib/format-heading";
+import {
+  filterCategoriesForListing,
+  filterCoursesForListing,
+} from "@/lib/course-listings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const pageData = await pageService.getPageByRoute("courses");
@@ -45,10 +49,16 @@ async function CoursesContent() {
     courseService.getCourseCategories(),
   ]);
 
+  const visibleCategories = filterCategoriesForListing(categories);
+  const visibleCourses = filterCoursesForListing(courses, categories);
+
   return (
     <div className="space-y-12">
       {/* Interactive Courses Explorer */}
-      <CoursesExplorer initialCourses={courses} categories={categories} />
+      <CoursesExplorer
+        initialCourses={visibleCourses}
+        categories={visibleCategories}
+      />
 
       {/* Advisory & Counseling Call-to-Action */}
       <CourseAdvisoryCard />

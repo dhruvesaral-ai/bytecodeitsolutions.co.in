@@ -10,6 +10,7 @@ import { useTheme } from "@/context/theme-context";
 import { useSettings } from "@/context/setting-context";
 import { useAuth } from "@/context/auth-context";
 import { useEnquiry } from "@/context/enquiry-context";
+import { isExternalNavItem } from "@/lib/main-nav";
 
 export default function AppSidebar() {
   const pathname = usePathname();
@@ -146,17 +147,43 @@ export default function AppSidebar() {
                 aria-label="Mobile Navigation Links"
               >
                 {navItems.map((item) => {
-                  const isActive = pathname === item.href;
+                  const isActive =
+                    !isExternalNavItem(item) && pathname === item.href;
+                  const className = item.highlight
+                    ? `rounded-md px-3.5 py-2.5 text-sm font-bold uppercase tracking-wide transition-colors ${
+                        isActive
+                          ? "bg-[#DE5426] text-white"
+                          : "bg-[#F58216] text-white hover:bg-[#DE5426]"
+                      }`
+                    : `rounded-md px-3.5 py-2.5 text-sm font-medium transition-colors ${
+                        isActive
+                          ? "bg-neutral-100 font-semibold text-[#1550A5] dark:bg-neutral-800 dark:text-blue-400"
+                          : "text-neutral-700 hover:bg-neutral-50 hover:text-black dark:text-neutral-300 dark:hover:bg-neutral-800/60 dark:hover:text-white"
+                      }`;
+
+                  if (isExternalNavItem(item)) {
+                    return (
+                      <a
+                        key={item.href}
+                        href={item.href}
+                        onClick={closeSidebar}
+                        target={item.openInNewTab ? "_blank" : undefined}
+                        rel={
+                          item.openInNewTab ? "noopener noreferrer" : undefined
+                        }
+                        className={className}
+                      >
+                        {item.label}
+                      </a>
+                    );
+                  }
+
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
                       onClick={closeSidebar}
-                      className={`rounded-md px-3.5 py-2.5 text-sm font-medium transition-colors ${
-                        isActive
-                          ? "bg-neutral-100 font-semibold text-[#1550A5] dark:bg-neutral-800 dark:text-blue-400"
-                          : "text-neutral-700 hover:bg-neutral-50 hover:text-black dark:text-neutral-300 dark:hover:bg-neutral-800/60 dark:hover:text-white"
-                      }`}
+                      className={className}
                     >
                       {item.label}
                     </Link>

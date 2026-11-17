@@ -11,57 +11,40 @@ import { useEnquiry } from "@/context/enquiry-context";
 import { useAuth } from "@/context/auth-context";
 import { useSidebar } from "@/context/sidebar-context";
 import type { PageData } from "@/services/PageService";
+import {
+  buildMainNavItems,
+  formatNavHref,
+  formatNavLabel,
+  isExternalNavItem,
+  type MainNavItem,
+} from "@/lib/main-nav";
 
-export interface NavItem {
-  label: string;
-  href: string;
-}
+export type NavItem = MainNavItem;
 
-export function formatNavLabel(routeName: string): string {
-  const clean = routeName.trim().replace(/^\/+/, "");
-  if (!clean || clean.toLowerCase() === "home") {
-    return "Home";
-  }
-  return clean
-    .replace(/[-_]+/g, " ")
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-}
-
-export function formatNavHref(routeName: string): string {
-  const clean = routeName.trim().replace(/^\/+/, "");
-  if (!clean || clean.toLowerCase() === "home") {
-    return "/";
-  }
-  return `/${clean}`;
-}
-
-export function pagesToNavItems(pages: PageData[]): NavItem[] {
-  if (!pages || !Array.isArray(pages) || pages.length === 0) {
-    return [];
-  }
-
-  const items = pages.map((page) => ({
-    label: formatNavLabel(page.routeName),
-    href: formatNavHref(page.routeName),
-  }));
-
-  const uniqueItems: NavItem[] = [];
-  const seenHrefs = new Set<string>();
-
-  for (const item of items) {
-    if (!seenHrefs.has(item.href)) {
-      seenHrefs.add(item.href);
-      uniqueItems.push(item);
-    }
-  }
-
-  return uniqueItems;
-}
+export { formatNavHref, formatNavLabel };
 
 interface HeaderProps {
   initialPages?: PageData[];
+}
+
+function navLinkClassName(item: MainNavItem, isActive: boolean): string {
+  if (item.highlight) {
+    return [
+      "text-xs font-bold uppercase tracking-wide transition-colors",
+      "rounded-full px-3.5 py-1.5 shadow-sm",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F58216] focus-visible:ring-offset-2",
+      isActive
+        ? "bg-[#DE5426] text-white ring-2 ring-white/30 dark:ring-black/40"
+        : "bg-[#F58216] text-white hover:bg-[#DE5426]",
+    ].join(" ");
+  }
+
+  return [
+    "text-sm transition-colors py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] rounded",
+    isActive
+      ? "font-semibold text-[#1550A5] dark:text-blue-400 border-b-2 border-[#1550A5] dark:border-blue-400"
+      : "font-medium text-neutral-700 hover:text-[#1550A5] dark:text-neutral-300 dark:hover:text-white",
+  ].join(" ");
 }
 
 export default function Header({ initialPages }: HeaderProps = {}) {
@@ -81,8 +64,8 @@ export default function Header({ initialPages }: HeaderProps = {}) {
   const { openNav, setNavItems: setSidebarNavItems } = useSidebar();
   const { openEnquiry } = useEnquiry();
   const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
-  const [navItems, setNavItems] = useState<NavItem[]>(() =>
-    initialPages && initialPages.length > 0 ? pagesToNavItems(initialPages) : []
+  const [navItems, setNavItems] = useState<MainNavItem[]>(() =>
+    buildMainNavItems(initialPages ?? [])
   );
 
   useEffect(() => {
@@ -90,11 +73,9 @@ export default function Header({ initialPages }: HeaderProps = {}) {
   }, []);
 
   useEffect(() => {
-    if (initialPages && initialPages.length > 0) {
-      const items = pagesToNavItems(initialPages);
-      setNavItems(items);
-      setSidebarNavItems(items);
-    }
+    const items = buildMainNavItems(initialPages ?? []);
+    setNavItems(items);
+    setSidebarNavItems(items);
   }, [initialPages, setSidebarNavItems]);
 
   const isDarkMode = mounted && resolvedTheme === "dark";
@@ -130,21 +111,36 @@ export default function Header({ initialPages }: HeaderProps = {}) {
 
         {/* Middle: Navigation Links (Desktop) */}
         <nav
-          className="hidden md:flex items-center gap-8"
+          className="hidden md:flex items-center gap-6 lg:gap-8"
           aria-label="Main Navigation"
         >
           {navItems.map((item) => {
-            const isActive = pathname === item.href;
+            const isActive =
+              !isExternalNavItem(item) && pathname === item.href;
+            const className = navLinkClassName(item, isActive);
+
+            if (isExternalNavItem(item)) {
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  target={item.openInNewTab ? "_blank" : undefined}
+                  rel={
+                    item.openInNewTab ? "noopener noreferrer" : undefined
+                  }
+                  className={className}
+                >
+                  {item.label}
+                </a>
+              );
+            }
+
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 scroll={true}
-                className={`text-sm transition-colors py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1550A5] rounded ${
-                  isActive
-                    ? "font-semibold text-[#1550A5] dark:text-blue-400 border-b-2 border-[#1550A5] dark:border-blue-400"
-                    : "font-medium text-neutral-700 hover:text-[#1550A5] dark:text-neutral-300 dark:hover:text-white"
-                }`}
+                className={className}
               >
                 {item.label}
               </Link>
