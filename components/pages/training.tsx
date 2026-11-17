@@ -59,26 +59,6 @@ export default function Training({
               {subheading}
             </p>
           )}
-
-          {/* Metrics Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-10 pt-8 border-t border-neutral-200/80 dark:border-neutral-800/80">
-            {stats.map((stat, i) => {
-              const Icon = stat.icon;
-              return (
-                <div key={i} className="flex flex-col items-center p-3">
-                  <div className="flex size-10 items-center justify-center rounded-xl bg-[#1550A5]/10 text-[#1550A5] dark:bg-blue-500/15 dark:text-blue-300 mb-2">
-                    <Icon className="size-5" />
-                  </div>
-                  <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
-                    {stat.value}
-                  </span>
-                  <span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium mt-0.5">
-                    {stat.label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
         </div>
       </section>
 
