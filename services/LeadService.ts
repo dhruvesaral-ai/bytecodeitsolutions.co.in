@@ -4,6 +4,7 @@ export type LeadStatus = "hot" | "medium" | "cold" | "converted";
 export type LeadGeneratedSource = "online" | "offline";
 
 export interface CreateWebLeadInput {
+  formName: string;
   firstName: string;
   lastName?: string | null;
   username: string;

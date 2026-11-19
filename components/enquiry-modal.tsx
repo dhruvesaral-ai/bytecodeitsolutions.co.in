@@ -162,6 +162,7 @@ export function useEnquiryForm(
     const leadMobile =
       isAuthenticated && accountMobile ? accountMobile : phone;
     await createWebLead({
+      formName: mode === "course" ? "Course Enquiry" : "Message Enquiry",
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       username: leadMobile,
