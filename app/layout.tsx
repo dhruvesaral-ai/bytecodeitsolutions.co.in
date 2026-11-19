@@ -10,6 +10,7 @@ import { SidebarProvider } from "@/context/sidebar-context";
 import AppSidebar from "@/components/sidebar";
 import SmoothScroll from "@/components/smooth-scroll";
 import Header from "@/components/header";
+import PageVisitTracker from "@/components/page-visit-tracker";
 import { pageService } from "@/services/PageService";
 import { getCachedSettings } from "@/lib/cached-settings";
 import { SITE_URL } from "@/config";
@@ -20,7 +21,12 @@ import ScrollToTop from "@/components/scroll-to-top";
 
 async function HeaderSlot() {
   const pages = await pageService.getPages();
-  return <Header initialPages={pages} />;
+  return (
+    <>
+      <Header initialPages={pages} />
+      <PageVisitTracker pages={pages} />
+    </>
+  );
 }
 
 const neueMachina = localFont({

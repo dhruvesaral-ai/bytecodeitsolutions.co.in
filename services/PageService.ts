@@ -1,5 +1,5 @@
 import { MEDIA_BASE_URL } from "@/config";
-import { get } from "@/lib/api-method";
+import { get, patch } from "@/lib/api-method";
 import { formatHeadingHtml } from "@/lib/format-heading";
 
 export interface PageData {
@@ -13,6 +13,7 @@ export interface PageData {
   metaDescription?: string | null;
   content?: string | null;
   updatedAt?: string | null;
+  visits?: number | null;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -54,7 +55,12 @@ function isPageData(value: unknown): value is PageData {
       typeof value.content === "string") &&
     (value.updatedAt === undefined ||
       value.updatedAt === null ||
-      typeof value.updatedAt === "string")
+      typeof value.updatedAt === "string") &&
+    (value.visits === undefined ||
+      value.visits === null ||
+      (typeof value.visits === "number" &&
+        Number.isSafeInteger(value.visits) &&
+        value.visits >= 0))
   );
 }
 
@@ -92,6 +98,10 @@ function normalizePage(page: PageData): PageData {
 }
 
 export default class PageService {
+  async updateVisits(pageId: string, visits: number): Promise<void> {
+    await patch(`pages/${encodeURIComponent(pageId)}`, { visits });
+  }
+
   async getPages(): Promise<PageData[]> {
     try {
       const response = await get<{ data?: unknown[] }>("pages");
