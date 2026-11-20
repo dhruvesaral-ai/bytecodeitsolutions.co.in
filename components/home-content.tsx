@@ -8,7 +8,6 @@ import PlacementGuaranteedSection from "@/components/placement-guaranteed-sectio
 import {
   filterCategoriesForListing,
   filterCoursesForListing,
-  hiddenListingCategoryIds,
 } from "@/lib/course-listings";
 
 export default async function HomeContent() {
@@ -19,20 +18,20 @@ export default async function HomeContent() {
     successStoriesService.getVideoIds(),
   ]);
 
-  const hiddenCategoryIds = hiddenListingCategoryIds(categoriesData);
-
-  const placementCategory = categoriesData.find(
-    (category) =>
-      category.slug === "100%-placement-opportunity-guaranteed-courses" ||
-      category.slug === "bootcamp-courses"
+  const placementCategoryIds = new Set(
+    categoriesData
+      .filter(
+        (category) =>
+          category.slug === "100%-placement-opportunity-guaranteed-courses" ||
+          category.slug === "bootcamp-courses"
+      )
+      .map((category) => category.id)
   );
 
   const placementCourses = courses.filter(
     (course) =>
-      !hiddenCategoryIds.has(course.courseCategorieId) &&
-      (course.isPlacementGurranted ||
-        (placementCategory && course.courseCategorieId === placementCategory.id)) &&
-      course.status === "active"
+      course.status === "active" &&
+      (course.isPlacementGurranted || placementCategoryIds.has(course.courseCategorieId))
   );
 
   const listingCourses = filterCoursesForListing(courses, categoriesData);
