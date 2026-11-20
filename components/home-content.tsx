@@ -18,20 +18,17 @@ export default async function HomeContent() {
     successStoriesService.getVideoIds(),
   ]);
 
-  const placementCategoryIds = new Set(
-    categoriesData
-      .filter(
-        (category) =>
-          category.slug === "100%-placement-opportunity-guaranteed-courses" ||
-          category.slug === "bootcamp-courses"
-      )
-      .map((category) => category.id)
+  const bootcampSlug = "bootcamp-courses";
+  const bootcampCategoryIds = new Set(
+    categoriesData.filter((category) => category.slug === bootcampSlug).map((category) => category.id)
   );
 
   const placementCourses = courses.filter(
     (course) =>
       course.status === "active" &&
-      (course.isPlacementGurranted || placementCategoryIds.has(course.courseCategorieId))
+      course.isPlacementGurranted &&
+      !bootcampCategoryIds.has(course.courseCategorieId) &&
+      course.courseCategorie?.slug !== bootcampSlug
   );
 
   const listingCourses = filterCoursesForListing(courses, categoriesData);
