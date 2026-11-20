@@ -18,17 +18,19 @@ export default async function HomeContent() {
     successStoriesService.getVideoIds(),
   ]);
 
-  const bootcampSlug = "bootcamp-courses";
-  const bootcampCategoryIds = new Set(
-    categoriesData.filter((category) => category.slug === bootcampSlug).map((category) => category.id)
+  const excludedPlacementCategorySlug = "bsep";
+  const excludedPlacementCategoryIds = new Set(
+    categoriesData
+      .filter((category) => category.slug === excludedPlacementCategorySlug)
+      .map((category) => category.id)
   );
 
   const placementCourses = courses.filter(
     (course) =>
       course.status === "active" &&
       course.isPlacementGurranted &&
-      !bootcampCategoryIds.has(course.courseCategorieId) &&
-      course.courseCategorie?.slug !== bootcampSlug
+      !excludedPlacementCategoryIds.has(course.courseCategorieId) &&
+      course.courseCategorie?.slug !== excludedPlacementCategorySlug
   );
 
   const listingCourses = filterCoursesForListing(courses, categoriesData);
