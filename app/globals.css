@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @import "lenis/dist/lenis.css";
 
+body:has([data-training-actions]) {
+  padding-bottom: calc(4rem + 1px + env(safe-area-inset-bottom));
+}
+
 :root {
   /* Brand Color Tokens */
   --color-blue: #1550A5;

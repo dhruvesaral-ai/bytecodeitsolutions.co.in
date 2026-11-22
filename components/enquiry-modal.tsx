@@ -305,15 +305,21 @@ interface EnquiryModalProps {
   isOpen: boolean;
   onClose: () => void;
   form: EnquiryForm;
+  isTraining?: boolean;
 }
 
-export default function EnquiryModal({ isOpen, onClose, form }: EnquiryModalProps) {
+export default function EnquiryModal({ isOpen, ...props }: EnquiryModalProps) {
   if (!isOpen) return null;
-  return <EnquirySheet onClose={onClose} form={form} />;
+  return <EnquirySheet {...props} />;
 }
 
-function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryForm }) {
+function EnquirySheet({ onClose, form, isTraining = false }: Omit<EnquiryModalProps, "isOpen">) {
   const otpInputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const enquiryDescription = isTraining
+    ? "Tell us about your training needs or the workshop you’d like to host."
+    : form.mode === "course"
+      ? "Share your details and our career counselor will reach out shortly."
+      : "Tell us about your project and our tech team will reach out shortly.";
 
   // Lock body scroll while the sheet is open
   useEffect(() => {
@@ -395,9 +401,7 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
             <p className="mt-1 text-xs text-blue-100/80 leading-relaxed">
               {form.step === "otp"
                 ? `Enter the 4-digit code sent via SMS to +91 ${form.phone}`
-                : form.mode === "course"
-                ? "Share your details and our career counselor will reach out shortly."
-                : "Tell us about your project and our tech team will reach out shortly."}
+                : enquiryDescription}
             </p>
           </div>
 
@@ -498,8 +502,7 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
               )}
             </div>
 
-            {/* Desktop Direct Submit Action */}
-            <div className="hidden md:flex items-center justify-end pt-3">
+            <div className={`${isTraining ? "flex" : "hidden md:flex"} items-center justify-end pt-3`}>
               <button
                 type="submit"
                 disabled={form.isSubmitting || form.otp.some((d) => !d)}
@@ -638,7 +641,6 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
               </div>
             )}
 
-            {/* Project Requirement Message */}
             {form.mode === "message" && (
               <div className="space-y-1.5">
                 <label
@@ -652,7 +654,9 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
                   rows={4}
                   value={form.message}
                   onChange={(e) => form.setMessage(e.target.value)}
-                  placeholder="Tell us about your project or requirement..."
+                  placeholder={isTraining
+                    ? "Share the topic, audience, or preferred dates."
+                    : "Tell us about your project or requirement..."}
                   className="w-full resize-none rounded-md border border-white/30 bg-white px-3 py-2 text-base sm:text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-[#F58216] focus:outline-none focus:ring-1 focus:ring-[#F58216]"
                 />
               </div>
@@ -670,8 +674,7 @@ function EnquirySheet({ onClose, form }: { onClose: () => void; form: EnquiryFor
               </p>
             )}
 
-            {/* Desktop Direct Submit Action */}
-            <div className="hidden md:flex items-center justify-end pt-2">
+            <div className={`${isTraining ? "flex" : "hidden md:flex"} items-center justify-end pt-2`}>
               <button
                 type="submit"
                 disabled={form.isSubmitting}

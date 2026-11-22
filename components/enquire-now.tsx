@@ -29,8 +29,10 @@ function EnquireNowFab({ mode, showButton }: EnquireNowProps) {
   const pathname = usePathname();
   const { isOpen, setIsOpen, closeEnquiry, mode: contextMode } = useEnquiry();
 
-  const enquiryMode: EnquiryMode =
-    contextMode ?? mode ?? (pathname.startsWith("/development") ? "message" : "course");
+  const isTraining = /^\/trainings?\/?$/i.test(pathname);
+  const enquiryMode: EnquiryMode = isTraining
+    ? "message"
+    : contextMode ?? mode ?? (pathname.startsWith("/development") ? "message" : "course");
   const form = useEnquiryForm(isOpen, closeEnquiry, enquiryMode);
 
   const handleClick = () => {
@@ -44,7 +46,7 @@ function EnquireNowFab({ mode, showButton }: EnquireNowProps) {
 
   return (
     <>
-      {showButton && (
+      {showButton && !isTraining && (
         <button
           type="button"
           onClick={handleClick}
@@ -84,7 +86,7 @@ function EnquireNowFab({ mode, showButton }: EnquireNowProps) {
           )}
         </button>
       )}
-      <EnquiryModal isOpen={isOpen} onClose={closeEnquiry} form={form} />
+      <EnquiryModal isOpen={isOpen} onClose={closeEnquiry} form={form} isTraining={isTraining} />
     </>
   );
 }
