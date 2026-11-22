@@ -89,7 +89,7 @@ export default function Slider({
           pagination={{
             clickable: true,
           }}
-          className="hero-swiper h-full w-full"
+          className="hero-swiper h-full w-full max-sm:[&_.swiper-pagination]:hidden"
         >
           {slides.map((slide, index) => {
             const align = getAlignmentClasses(slide.textContainerAlign);
@@ -125,13 +125,13 @@ export default function Slider({
                       sizes="(max-width: 1280px) 100vw, 1280px"
                     />
                   )}
-                  {hasContent && <div className="absolute inset-0 bg-black/65" />}
+                  {hasContent && <div className="absolute inset-0 hidden bg-black/65 sm:block" />}
                 </div>
 
                 {/* Content Overlay */}
                 {hasContent && (
                   <div
-                    className={`relative z-20 pointer-events-none mx-auto flex h-full max-w-7xl flex-col justify-center px-6 sm:px-10 lg:px-16 text-white ${align.container}`}
+                    className={`relative z-20 pointer-events-none mx-auto hidden h-full max-w-7xl flex-col justify-center px-10 text-white sm:flex lg:px-16 ${align.container}`}
                   >
                     <div className={`max-w-3xl ${align.content} pointer-events-auto`}>
                       {slide.title && (

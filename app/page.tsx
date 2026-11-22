@@ -33,77 +33,29 @@ export async function generateMetadata(): Promise<Metadata> {
 async function HomeHero() {
   const page = await pageService.getPageByRoute("home");
 
-  if (!page?.heading && !page?.subheading && !page?.videoUrl) {
+  if (!page?.heading && !page?.subheading) {
     return null;
   }
 
-  const hasVideo = Boolean(page.videoUrl);
+  const headingClassName = "text-3xl font-bold text-neutral-900 dark:text-white sm:text-4xl md:text-5xl lg:text-6xl";
 
   return (
-    <section
-      className={`relative overflow-hidden w-full text-center ${
-        hasVideo
-          ? "min-h-[380px] sm:min-h-[440px] md:min-h-[500px] flex items-center justify-center py-16 sm:py-20 md:py-24 bg-neutral-950"
-          : "pt-8 sm:pt-12 pb-4 max-w-4xl mx-auto"
-      } px-4 sm:px-6 lg:px-8`}
-    >
-      {hasVideo && page.videoUrl && (
-        <>
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            aria-hidden="true"
-            tabIndex={-1}
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-            src={page.videoUrl}
+    <section className="mx-auto w-full max-w-4xl px-4 pt-8 pb-4 text-left sm:px-6 sm:pt-12 lg:px-8">
+      {page.heading && (
+        page.heading.includes("<") ? (
+          <h1
+            className={headingClassName}
+            dangerouslySetInnerHTML={{ __html: formatHeadingHtml(page.heading) }}
           />
-          {/* Light contrast overlay so video is sharp, vibrant, and clearly visible */}
-          <div
-            className="pointer-events-none absolute inset-0 bg-black/35 dark:bg-black/70"
-            aria-hidden="true"
-          />
-          {/* Subtle edge fade to blend naturally into adjacent content */}
-          <div
-            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30 dark:from-black/30 dark:via-transparent dark:to-neutral-950/40"
-            aria-hidden="true"
-          />
-        </>
+        ) : (
+          <h1 className={headingClassName}>{page.heading}</h1>
+        )
       )}
-
-      <div className="relative z-10 max-w-4xl mx-auto">
-        {page.heading && (
-          page.heading.includes("<") ? (
-            <h1
-              className={`text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold ${
-                hasVideo ? "text-white drop-shadow-md" : "text-neutral-900 dark:text-white"
-              }`}
-              dangerouslySetInnerHTML={{ __html: formatHeadingHtml(page.heading) }}
-            />
-          ) : (
-            <h1
-              className={`text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold ${
-                hasVideo ? "text-white drop-shadow-md" : "text-neutral-900 dark:text-white"
-              }`}
-            >
-              {page.heading}
-            </h1>
-          )
-        )}
-        {page.subheading && (
-          <p
-            className={`mt-4 text-base sm:text-lg ${
-              hasVideo
-                ? "text-neutral-100 font-medium drop-shadow"
-                : "text-neutral-600 dark:text-neutral-400"
-            } max-w-2xl mx-auto leading-relaxed`}
-          >
-            {page.subheading}
-          </p>
-        )}
-      </div>
+      {page.subheading && (
+        <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-neutral-600 dark:text-neutral-400 sm:text-lg">
+          {page.subheading}
+        </p>
+      )}
     </section>
   );
 }
