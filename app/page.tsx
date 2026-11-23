@@ -52,7 +52,7 @@ async function HomeHero() {
         )
       )}
       {page.subheading && (
-        <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-neutral-600 dark:text-neutral-400 sm:text-lg">
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-neutral-600 dark:text-neutral-400 sm:text-lg">
           {page.subheading}
         </p>
       )}
