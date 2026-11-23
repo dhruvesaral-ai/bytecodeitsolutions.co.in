@@ -37,10 +37,10 @@ async function HomeHero() {
     return null;
   }
 
-  const headingClassName = "text-3xl font-bold text-neutral-900 dark:text-white sm:text-4xl md:text-5xl lg:text-6xl";
+  const headingClassName = "max-w-[52rem] text-3xl font-bold text-neutral-900 dark:text-white sm:text-4xl md:text-5xl lg:text-6xl";
 
   return (
-    <section className="mx-auto w-full max-w-4xl px-4 pt-8 pb-4 text-left sm:px-6 sm:pt-12 lg:px-8">
+    <section className="mx-auto w-full max-w-7xl px-4 pt-8 pb-4 text-left sm:px-6 sm:pt-12 lg:px-8">
       {page.heading && (
         page.heading.includes("<") ? (
           <h1
